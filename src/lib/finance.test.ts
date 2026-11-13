@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { fire, futureValue, loanRepayment, savingsGoal } from './finance';
+import { effectiveRate, fire, flatLoan, futureValue, loanRepayment, savingsGoal } from './finance';
 
 describe('futureValue', () => {
   it('matches the closed-form annuity formula', () => {
@@ -62,5 +62,49 @@ describe('fire', () => {
     const f = fire(12000, 4, 0, 1000, 0);
     expect(f.target).toBeCloseTo(300000, 6);
     expect(f.years).toBeCloseTo(25, 6);
+  });
+});
+
+describe('effectiveRate', () => {
+  it('is the advertised rate compounded monthly on a reducing-balance loan with no fees', () => {
+    const l = loanRepayment(300000, 4, 25);
+    expect(effectiveRate(300000, l.payment, 300)).toBeCloseTo(Math.pow(1 + 0.04 / 12, 12) - 1, 8);
+  });
+
+  it('rises when a fee is taken upfront', () => {
+    const l = loanRepayment(300000, 4, 25);
+    expect(effectiveRate(300000 - 3000, l.payment, 300)!).toBeGreaterThan(effectiveRate(300000, l.payment, 300)!);
+  });
+
+  it('is zero when the repayments only return the money', () => {
+    expect(effectiveRate(12000, 1000, 12)).toBeCloseTo(0, 8);
+  });
+
+  it('is null when the repayments do not cover the amount received', () => {
+    expect(effectiveRate(12000, 900, 12)).toBeNull();
+    expect(effectiveRate(0, 100, 12)).toBeNull();
+  });
+});
+
+describe('flatLoan', () => {
+  it('charges interest on the full amount for the whole term', () => {
+    const l = flatLoan(20000, 3.5, 5);
+    expect(l.totalInterest).toBeCloseTo(3500, 8);
+    expect(l.payment).toBeCloseTo(23500 / 60, 8);
+    expect(l.series.at(-1)!.base).toBeCloseTo(0, 6);
+  });
+
+  it('has an EIR close to double the flat rate', () => {
+    // The repayments must be worth the 20,000 received when discounted at the EIR.
+    const l = flatLoan(20000, 3.5, 5);
+    const r = Math.pow(1 + l.eir!, 1 / 12) - 1;
+    const present = (l.payment * (1 - Math.pow(1 + r, -60))) / r;
+    expect(present).toBeCloseTo(20000, 4);
+    expect(l.eir!).toBeGreaterThan(0.065);
+    expect(l.eir!).toBeLessThan(0.07);
+  });
+
+  it('has a zero EIR at a 0% flat rate and no fee', () => {
+    expect(flatLoan(12000, 0, 1).eir).toBeCloseTo(0, 8);
   });
 });

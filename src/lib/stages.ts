@@ -52,6 +52,7 @@ export const stages: Stage[] = [
   stage('Save for the next few years', 'Money for a wedding, a renovation or a home should not be in shares.', [
     calc('savings-goal', 'How much a month gets me to a goal by a set date?'),
     calc('loan-repayment', 'What will a home loan cost each month, and how much is interest?'),
+    calc('flat-rate-loan', 'What does a car or personal loan really cost, behind the advertised rate?'),
   ]),
   stage('Start investing', 'Buy the whole market at low cost and keep adding. Know what each layer of fees takes.', [
     calc('compound-interest', 'What does investing every month grow into?'),

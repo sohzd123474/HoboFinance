@@ -1,4 +1,4 @@
-import { fire, futureValue, loanRepayment, savingsGoal, yearsToTarget, type YearPoint } from './finance';
+import { effectiveRate, fire, flatLoan, futureValue, loanRepayment, savingsGoal, yearsToTarget, type YearPoint } from './finance';
 
 export type ValueKind = 'money' | 'years' | 'text';
 
@@ -69,6 +69,8 @@ export function medisaveLimitForShieldPlan(age: number): number {
   return next <= 40 ? 300 : next <= 70 ? 600 : 900;
 }
 
+const rateText = (r: number | null) => (r === null ? 'n/a: the repayments do not cover the amount received' : `${(r * 100).toFixed(2)}%`);
+
 const ages = (list: number[]) => list.map((a) => ({ label: String(a), value: a }));
 
 export const calculators: Calculator[] = [
@@ -105,14 +107,16 @@ export const calculators: Calculator[] = [
     blurb: 'Work out the monthly repayment on a home, car or personal loan, and what it costs in interest.',
     fields: [
       { id: 'amount', label: 'Amount borrowed', unit: 'money', value: 300000, min: 100, max: 100000000, step: 1000, presets: [20000, 100000, 300000, 500000, 800000] },
-      { id: 'rate', label: 'Interest rate per year', unit: 'percent', value: 4, min: 0, max: 40, step: 0.05, presets: [2.6, 3, 3.5, 4, 5] },
+      { id: 'rate', label: 'Advertised interest rate', unit: 'percent', value: 4, min: 0, max: 40, step: 0.05, hint: 'The yearly rate charged on what you still owe, which is how home loans are quoted. For a car or personal loan quoted as a flat rate, use the flat-rate loan calculator.', presets: [2.6, 3, 3.5, 4, 5] },
       { id: 'years', label: 'Loan length', unit: 'years', value: 25, min: 1, max: 40, step: 1, presets: [5, 7, 15, 25, 30] },
+      { id: 'fee', label: 'Fees taken upfront', unit: 'money', value: 0, min: 0, max: 1000000, step: 100, hint: 'Processing or legal fees deducted from the loan or paid at the start.', presets: [0, 500, 2000, 5000] },
     ],
     compute: (v) => {
       const l = loanRepayment(v.amount, v.rate, v.years);
       return {
         headline: { label: 'Monthly repayment', value: l.payment, kind: 'money' },
         rows: [
+          { label: 'Effective interest rate (EIR)', value: rateText(effectiveRate(v.amount - (v.fee ?? 0), l.payment, Math.max(1, Math.round(v.years * 12)))), kind: 'text' },
           { label: 'Total repaid', value: l.totalPaid, kind: 'money' },
           { label: 'Of which interest', value: l.totalInterest, kind: 'money' },
         ],
@@ -122,7 +126,8 @@ export const calculators: Calculator[] = [
     },
     explain: [
       'This is a reducing-balance loan with equal monthly repayments. Interest is charged each month on what you still owe, so early repayments are mostly interest and later ones mostly pay off the loan.',
-      'It assumes the rate stays the same for the whole loan and leaves out fees and insurance. Flat-rate loans, common for cars, are worked out differently and cost more than the same headline rate here.',
+      'The effective interest rate (EIR) is the true yearly cost once monthly compounding and upfront fees are counted. On a loan charged on the falling balance it sits a little above the advertised rate: 4% advertised is 4.07% effective before fees. Use the EIR to compare one loan with another.',
+      'It assumes the rate stays the same for the whole loan and leaves out insurance. Flat-rate loans, common for cars and personal loans, are worked out differently and cost far more than the same advertised rate here; they have their own calculator.',
     ],
   },
   {
@@ -498,6 +503,35 @@ export const calculators: Calculator[] = [
     explain: [
       'Buying a fund priced in US dollars means converting Singapore dollars first. Brokers and robo-advisers rarely charge a visible fee for this; they give you a rate slightly worse than the market rate and keep the difference. A 0.5% spread is paid again when you convert back, so the round trip costs 1%.',
       'To find your spread, compare the rate your platform quotes with the mid-market rate at the same moment. Spreads differ widely between platforms, from a few hundredths of a percent to half a percent or more. This is a cost on top of the fund’s expense ratio and any commission.',
+    ],
+  },
+  {
+    slug: 'flat-rate-loan',
+    title: 'Flat-rate loan and EIR',
+    blurb: 'Turn the flat rate advertised on a car or personal loan into the effective interest rate you really pay.',
+    fields: [
+      { id: 'amount', label: 'Amount borrowed', unit: 'money', value: 20000, min: 100, max: 100000000, step: 500, presets: [5000, 10000, 20000, 50000, 100000] },
+      { id: 'rate', label: 'Advertised flat rate', unit: 'percent', value: 3.5, min: 0, max: 40, step: 0.01, hint: 'The headline yearly rate in the advertisement, charged on the full amount for the whole loan.', presets: [1.88, 2.78, 3.5, 5, 7] },
+      { id: 'years', label: 'Loan length', unit: 'years', value: 5, min: 1, max: 10, step: 1, presets: [1, 3, 5, 7] },
+      { id: 'fee', label: 'Fees taken upfront', unit: 'money', value: 0, min: 0, max: 100000, step: 50, hint: 'Processing fee deducted from the loan or paid at the start.', presets: [0, 100, 200, 500] },
+    ],
+    compute: (v) => {
+      const l = flatLoan(v.amount, v.rate, v.years, v.fee ?? 0);
+      return {
+        headline: { label: 'Effective interest rate (EIR)', value: rateText(l.eir), kind: 'text' },
+        rows: [
+          { label: 'Advertised flat rate', value: `${v.rate}%`, kind: 'text' },
+          { label: 'Monthly repayment', value: l.payment, kind: 'money' },
+          { label: 'Total interest', value: l.totalInterest, kind: 'money' },
+          { label: 'Total repaid', value: l.totalPaid, kind: 'money' },
+        ],
+        series: l.series,
+        legend: ['Still to pay'],
+      };
+    },
+    explain: [
+      'A flat rate charges interest on the full amount you borrowed for every year of the loan, even though you owe less after each repayment. The interest is simply amount × rate × years, added to the loan and divided into equal monthly repayments.',
+      'Because you are paying interest on money you have already returned, the true cost is close to double the advertised figure. The effective interest rate (EIR) is that true cost: the yearly rate, compounded monthly and counting upfront fees, at which your repayments match the money you actually received. Lenders in Singapore must show the EIR next to the advertised rate. Compare loans by EIR, never by the flat rate.',
     ],
   },
 ];

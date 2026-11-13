@@ -135,3 +135,48 @@ export function yearsToTarget(start: number, monthly: number, annualRatePct: num
   }
   return null;
 }
+
+/**
+ * Effective interest rate (EIR) of a loan: the yearly rate, with monthly
+ * compounding, at which the repayments are worth exactly the money received.
+ * `received` is the loan amount less any fee taken upfront. Returns a fraction
+ * (0.065 for 6.5%), or null if the repayments do not even return the money.
+ */
+export function effectiveRate(received: number, payment: number, months: number): number | null {
+  if (!(received > 0) || !(payment > 0) || months < 1) return null;
+  if (payment * months < received) return null;
+  const owed = (r: number) => (r === 0 ? payment * months : (payment * (1 - Math.pow(1 + r, -months))) / r);
+  let lo = 0;
+  let hi = 1; // 100% a month is far above any real loan
+  for (let k = 0; k < 200; k++) {
+    const mid = (lo + hi) / 2;
+    if (owed(mid) > received) lo = mid;
+    else hi = mid;
+  }
+  return Math.pow(1 + (lo + hi) / 2, 12) - 1;
+}
+
+export interface FlatLoanResult {
+  payment: number;
+  totalPaid: number;
+  totalInterest: number;
+  /** Null only when the inputs make no sense (see effectiveRate). */
+  eir: number | null;
+  series: YearPoint[];
+}
+
+/**
+ * A flat-rate loan, as car and personal loans are advertised: interest is
+ * charged on the full amount borrowed for every year of the loan, even though
+ * the amount owed falls with each repayment.
+ */
+export function flatLoan(amount: number, flatRatePct: number, years: number, upfrontFee = 0): FlatLoanResult {
+  const n = Math.max(1, Math.round(years * 12));
+  const totalInterest = (amount * flatRatePct * (n / 12)) / 100;
+  const payment = (amount + totalInterest) / n;
+  const series: YearPoint[] = [];
+  for (let m = 1; m <= n; m++) {
+    if (m % 12 === 0 || m === n) series.push({ year: Math.ceil(m / 12), base: Math.max(0, amount + totalInterest - payment * m), extra: 0 });
+  }
+  return { payment, totalPaid: payment * n, totalInterest, eir: effectiveRate(amount - upfrontFee, payment, n), series };
+}
