@@ -2,6 +2,8 @@
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "hobofinance",
   "compatibility_date": "2026-11-13",
+  // Cloudflare runs only "npx wrangler deploy" on each push, so the site build is hooked in here.
+  "build": { "command": "npm run build" },
   // Static site: Astro builds to ./dist and Workers serves it as static assets.
   "assets": {
     "directory": "./dist",
