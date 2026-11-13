@@ -407,11 +407,32 @@ const chipLabel = (n: number, unit: string) =>
     });
   }
 
+  // Inputs are saved in this browser once the visitor changes something, and restored on the next visit.
+  const storeKey = `hf:calc:${calc.slug}`;
+  let touched = false;
+  try {
+    const saved = JSON.parse(localStorage.getItem(storeKey) ?? 'null');
+    if (saved && typeof saved === 'object') {
+      for (const f of calc.fields) {
+        const v = saved[f.id];
+        if (typeof v !== 'number' || !Number.isFinite(v)) continue;
+        const input = root.querySelector<HTMLInputElement>(`#f-${f.id}`)!;
+        input.value = 'money' in input.dataset ? formatAmount(String(v)) : String(v);
+      }
+      touched = true;
+    }
+  } catch {}
+
   function update() {
     root.querySelectorAll('[data-symbol]').forEach((el) => (el.textContent = currencySymbol()));
     paintChips();
     const values = readValues();
     if (!values) return;
+    if (touched) {
+      try {
+        localStorage.setItem(storeKey, JSON.stringify(values));
+      } catch {}
+    }
     const r = calc.compute(values);
     out('headline-label').textContent = r.headline.label;
     out('headline').textContent = show(r.headline);
@@ -433,6 +454,7 @@ const chipLabel = (n: number, unit: string) =>
     b.addEventListener('click', () => {
       const input = root.querySelector<HTMLInputElement>(`#${b.dataset.for}`)!;
       input.value = 'money' in input.dataset ? formatAmount(b.dataset.value!) : b.dataset.value!;
+      touched = true;
       update();
     }),
   );
@@ -446,7 +468,12 @@ const chipLabel = (n: number, unit: string) =>
       el.setSelectionRange(pos, pos);
     }),
   );
-  root.querySelectorAll('input').forEach((el) => el.addEventListener('input', update));
+  root.querySelectorAll('input').forEach((el) =>
+    el.addEventListener('input', () => {
+      touched = true;
+      update();
+    }),
+  );
   document.addEventListener('hf-currency', update);
   update();
 </script>

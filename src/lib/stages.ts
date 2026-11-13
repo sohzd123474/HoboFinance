@@ -75,6 +75,9 @@ export const stages: Stage[] = [
     calc('financial-independence', 'How big a pot do I need to live off?'),
     tool('fire-cpf', 'Can my savings carry me to 55, when CPF opens up?'),
   ]),
+  stage('Get your report', 'Everything you have worked out, in one printable page.', [
+    { href: '/report/', title: 'Your report', question: 'See all my numbers together and save them as a PDF' },
+  ]),
 ].filter((s) => s.steps.length > 0);
 
 /** Every step once, in path order. */

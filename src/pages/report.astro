@@ -1,0 +1,16 @@
+---
+import Base from '../layouts/Base.astro';
+import Report from '../components/report/Report.tsx';
+---
+
+<Base title="Your report" description="A printable summary of every calculator you have filled in, with year-by-year breakdowns. Made in your browser; nothing is uploaded.">
+  <div class="wrap page-head">
+    <h1>Your report</h1>
+    <p class="lede">Everything you have worked out on this site in one place, with the year-by-year figures, ready to save as a PDF.</p>
+  </div>
+  <div class="wrap">
+    <Report client:only="react">
+      <p slot="fallback" style="margin-top:2rem">Putting your report together…</p>
+    </Report>
+  </div>
+</Base>
