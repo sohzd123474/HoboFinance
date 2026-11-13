@@ -790,3 +790,12 @@ table.data th.wrap-cell {
 .explain .points {
   margin-top: 0.6rem;
 }
+
+/* Column headings wrap onto two or three lines so a long heading does not
+   stretch its column and force the table to scroll sideways. */
+table.data thead th {
+  white-space: normal;
+  vertical-align: bottom;
+  text-wrap: balance;
+  line-height: 1.25;
+}
