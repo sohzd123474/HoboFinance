@@ -1,0 +1,23 @@
+---
+import Base from '../../layouts/Base.astro';
+import Concentration from '../../components/concentration/Concentration.tsx';
+---
+
+<Base
+  title="DCA and concentration checker"
+  description="Paste your holdings and monthly purchases to see how concentrated you are once index funds are split into the companies they hold."
+>
+  <div class="wrap page-head">
+    <h1>DCA and concentration checker</h1>
+    <p class="lede">
+      Paste what you hold and what you buy each month to see how much of each company you really own once your index
+      funds are counted.
+    </p>
+  </div>
+
+  <div class="wrap">
+    <Concentration client:only="react">
+      <p slot="fallback" style="margin-top:2rem">Loading the checker…</p>
+    </Concentration>
+  </div>
+</Base>
