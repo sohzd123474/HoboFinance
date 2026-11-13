@@ -1,6 +1,6 @@
 // Browser-side money formatting with a visitor-chosen currency.
 
-export const CURRENCIES = ['USD', 'SGD', 'EUR', 'GBP', 'AUD', 'CAD', 'INR', 'JPY', 'MYR', 'IDR', 'PHP'] as const;
+export const CURRENCIES = ['SGD', 'USD', 'EUR', 'GBP', 'AUD', 'CAD', 'INR', 'JPY', 'MYR', 'IDR', 'PHP'] as const;
 const KEY = 'hf-currency';
 const BY_REGION: Record<string, string> = {
   US: 'USD', SG: 'SGD', GB: 'GBP', AU: 'AUD', CA: 'CAD', IN: 'INR', JP: 'JPY', MY: 'MYR', ID: 'IDR', PH: 'PHP',
@@ -13,7 +13,7 @@ export function getCurrency(): string {
     if (saved && (CURRENCIES as readonly string[]).includes(saved)) return saved;
   } catch {}
   const region = (navigator.language || '').split('-')[1]?.toUpperCase();
-  return (region && BY_REGION[region]) || 'USD';
+  return (region && BY_REGION[region]) || 'SGD';
 }
 
 export function setCurrency(code: string) {

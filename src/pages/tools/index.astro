@@ -1,0 +1,14 @@
+---
+import Base from '../../layouts/Base.astro';
+import LinkList from '../../components/LinkList.astro';
+import { tools } from '../../lib/tools';
+---
+
+<Base title="Tools" description="Investing tools for people in Singapore: strategy backtests, ETF tax drag, CPF and FIRE planning.">
+  <div class="wrap page-head">
+    <h1>Tools</h1>
+    <p class="lede">Investing tools built for people in Singapore. Your inputs stay in your browser.</p>
+    <LinkList items={tools.filter((t) => t.ready).map((t) => ({ href: `/tools/${t.slug}/`, title: t.title, blurb: t.blurb }))} />
+    {!tools.some((t) => t.ready) && <p style="margin-top:2rem">The first tools are being built. Try the <a href="/calculators/">basic calculators</a> in the meantime.</p>}
+  </div>
+</Base>

@@ -28,13 +28,24 @@ const canonical = new URL(path, Astro.site);
     <meta property="og:url" content={canonical} />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="theme-color" content="#1d4b3c" />
+    <script is:inline>
+      (function () {
+        var t = null;
+        try {
+          t = localStorage.getItem('hf-theme');
+        } catch (e) {}
+        if (t !== 'light' && t !== 'dark') t = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        document.documentElement.dataset.theme = t;
+      })();
+    </script>
   </head>
   <body>
     <header class="site-head">
       <div class="wrap">
         <a class="wordmark" href="/">Hobo Finance</a>
         <nav aria-label="Main">
-          <a href="/calculators/" aria-current={path.startsWith('/calculators') ? 'page' : undefined}>Calculators</a>
+          <a href="/tools/" aria-current={path.startsWith('/tools') ? 'page' : undefined}>Tools</a>
+          <a href="/calculators/" aria-current={path.startsWith('/calculators') ? 'page' : undefined}>Basics</a>
           <a href="/blog/" aria-current={path.startsWith('/blog') ? 'page' : undefined}>Blog</a>
         </nav>
         <label class="currency">
@@ -43,6 +54,7 @@ const canonical = new URL(path, Astro.site);
             {CURRENCIES.map((c) => <option value={c}>{c}</option>)}
           </select>
         </label>
+        <button class="theme-toggle" id="theme-toggle" type="button">Dark mode</button>
       </div>
     </header>
 
@@ -53,10 +65,17 @@ const canonical = new URL(path, Astro.site);
     <footer class="site-foot">
       <div class="wrap flow">
         <p>
-          Hobo Finance is free to use. The calculators give estimates from the numbers you enter; they are general
-          information, not financial advice. Check important decisions with a qualified adviser.
+          <strong>Not financial advice.</strong> Hobo Finance is general information for people in Singapore. The tools
+          give estimates from the numbers you enter and from past market data, which does not predict the future. Check
+          important decisions with a licensed adviser.
         </p>
-        <p>Nothing you type into a calculator leaves your device.</p>
+        <p>Nothing you type here leaves your device. Your inputs are saved in this browser only.</p>
+        <div class="foot-actions">
+          <button class="btn" id="export-inputs" type="button">Export my inputs</button>
+          <button class="btn" id="import-inputs" type="button">Import my inputs</button>
+          <input id="import-file" type="file" accept="application/json,.json" hidden />
+          <span id="io-status" role="status"></span>
+        </div>
       </div>
     </footer>
 
@@ -67,6 +86,65 @@ const canonical = new URL(path, Astro.site);
         select.value = getCurrency();
         select.addEventListener('change', () => setCurrency(select.value));
       }
+
+      const toggle = document.querySelector<HTMLButtonElement>('#theme-toggle');
+      const paint = () => {
+        if (toggle) toggle.textContent = document.documentElement.dataset.theme === 'dark' ? 'Light mode' : 'Dark mode';
+      };
+      paint();
+      toggle?.addEventListener('click', () => {
+        const next = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
+        document.documentElement.dataset.theme = next;
+        try {
+          localStorage.setItem('hf-theme', next);
+        } catch {}
+        paint();
+      });
+
+      // Export and import everything this site has saved in the browser.
+      const status = document.querySelector<HTMLElement>('#io-status')!;
+      const file = document.querySelector<HTMLInputElement>('#import-file')!;
+      const ours = (k: string) => k.startsWith('hf:') || k.startsWith('hf-');
+      document.querySelector('#export-inputs')?.addEventListener('click', () => {
+        const data: Record<string, string> = {};
+        try {
+          for (let i = 0; i < localStorage.length; i++) {
+            const k = localStorage.key(i)!;
+            if (ours(k)) data[k] = localStorage.getItem(k)!;
+          }
+        } catch {
+          status.textContent = 'This browser is blocking saved data, so there is nothing to export.';
+          return;
+        }
+        const url = URL.createObjectURL(new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' }));
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'hobofinance-inputs.json';
+        a.click();
+        URL.revokeObjectURL(url);
+        status.textContent = 'Exported ' + Object.keys(data).length + ' saved items.';
+      });
+      document.querySelector('#import-inputs')?.addEventListener('click', () => file.click());
+      file.addEventListener('change', async () => {
+        const f = file.files?.[0];
+        if (!f) return;
+        try {
+          const data = JSON.parse(await f.text());
+          if (typeof data !== 'object' || data === null || Array.isArray(data)) throw new Error('shape');
+          let n = 0;
+          for (const [k, v] of Object.entries(data)) {
+            if (ours(k) && typeof v === 'string') {
+              localStorage.setItem(k, v);
+              n++;
+            }
+          }
+          if (n === 0) throw new Error('empty');
+          location.reload();
+        } catch {
+          status.textContent = 'That file could not be imported. Choose a file made with Export my inputs.';
+        }
+        file.value = '';
+      });
     </script>
   </body>
 </html>

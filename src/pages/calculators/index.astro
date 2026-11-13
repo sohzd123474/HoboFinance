@@ -1,14 +1,13 @@
 ---
 import Base from '../../layouts/Base.astro';
-import Tickets from '../../components/Tickets.astro';
+import LinkList from '../../components/LinkList.astro';
+import { calculators } from '../../lib/calculators';
 ---
 
-<Base title="Calculators" description="Free calculators for compound interest, loans, savings goals and financial independence.">
+<Base title="Basic calculators" description="Free calculators for compound interest, loans, savings goals and financial independence.">
   <div class="wrap page-head">
-    <h1>Calculators</h1>
+    <h1>Basic calculators</h1>
     <p class="lede">Change any number and the answer updates as you type. Pick your currency at the top of the page.</p>
+    <LinkList items={calculators.map((c) => ({ href: `/calculators/${c.slug}/`, title: c.title, blurb: c.blurb }))} />
   </div>
-  <section class="wrap" style="padding-top:1rem">
-    <Tickets />
-  </section>
 </Base>
