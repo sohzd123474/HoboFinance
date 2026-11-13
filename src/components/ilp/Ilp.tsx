@@ -155,12 +155,20 @@ export default function Ilp() {
             <input id="ilp-keep" type="checkbox" checked={o.keepPaying} onChange={(e) => set('keepPaying', e.target.checked)} />
             Keep paying after the initial investment period, for all {YEARS} years
           </label>
-          <p className="note">
-            The ILP is a regular-premium investment-linked policy with charges like those of AIA Pro Achiever 3.0. Every
-            charge and bonus can be changed further down, so the tool works for other policies. The base premium is paid at the start of each year and the top-up at the start of each month, for{' '}
-            {o.keepPaying ? YEARS : Math.min(o.iipYears, YEARS)} years. The DIY route puts the same cash into VWRA on the same
-            dates. Both are then left invested until year {YEARS}.
-          </p>
+          <ul className="points">
+            <li>
+              <strong>The ILP modelled.</strong> A regular-premium investment-linked policy with charges like those of AIA
+              Pro Achiever 3.0. Change any charge or bonus further down to match another policy.
+            </li>
+            <li>
+              <strong>When money goes in.</strong> The base premium is paid at the start of each year and the top-up at
+              the start of each month, for {o.keepPaying ? YEARS : Math.min(o.iipYears, YEARS)} years.
+            </li>
+            <li>
+              <strong>The DIY route.</strong> The same cash goes into VWRA on the same dates. Both are then left invested
+              until year {YEARS}.
+            </li>
+          </ul>
         </div>
       </section>
 
@@ -204,10 +212,15 @@ export default function Ilp() {
                 </tbody>
               </table>
             </div>
-            <p className="note">
-              ILP charges are shown before bonuses of {sgd(r.ilp.welcomeBonus + r.ilp.specialBonus)}, which are already
-              included in the ILP’s final value. The percentage is the difference as a share of the DIY value.
-            </p>
+            <ul className="points">
+              <li>
+                <strong>Bonuses are counted.</strong> The ILP’s final value already includes bonuses of{' '}
+                {sgd(r.ilp.welcomeBonus + r.ilp.specialBonus)}. ILP charges are shown before those bonuses.
+              </li>
+              <li>
+                <strong>The percentage.</strong> It is the difference as a share of the DIY value.
+              </li>
+            </ul>
 
             <div className="seg" role="group" aria-label="Show">
               {TABS.map((t) => (
@@ -338,7 +351,7 @@ export default function Ilp() {
                         <td>{pct(o.grossReturnPct / 100, 2)}</td>
                       </tr>
                       <tr>
-                        <td>Return you actually get a year</td>
+                        <td>Return you get a year</td>
                         <td>{r.ilp.irr === null ? 'n/a: the account ends at zero' : pct(r.ilp.irr, 2)}</td>
                         <td>{r.diy.irr === null ? 'n/a: the account ends at zero' : pct(r.diy.irr, 2)}</td>
                       </tr>
@@ -350,11 +363,19 @@ export default function Ilp() {
                     </tbody>
                   </table>
                 </div>
-                <p className="note">
-                  Charges are the dollars taken out over {YEARS} years, not adjusted for when they were taken. The return
-                  you actually get is the money-weighted rate on what you paid in, with bonuses counted. Reduction in
-                  yield is the return before charges minus that rate: the yearly return lost to charges, net of bonuses.
-                </p>
+                <ul className="points">
+                  <li>
+                    <strong>Charges.</strong> The dollars taken out over {YEARS} years, not adjusted for when they were
+                    taken.
+                  </li>
+                  <li>
+                    <strong>Return you get.</strong> The money-weighted rate on what you paid in, with bonuses counted.
+                  </li>
+                  <li>
+                    <strong>Reduction in yield.</strong> The yearly return lost to charges, net of bonuses. It is the
+                    return before charges minus the return you get.
+                  </li>
+                </ul>
               </>
             )}
           </>
@@ -367,7 +388,7 @@ export default function Ilp() {
           <h3>ILP bonuses</h3>
           <label className="check" htmlFor="ilp-bonus-auto">
             <input id="ilp-bonus-auto" type="checkbox" checked={o.bonusFromTable} onChange={(e) => set('bonusFromTable', e.target.checked)} />
-            Set the welcome bonus from the table below, using the premium and period chosen above
+            Take the welcome bonus from the table below, using your premium and period
           </label>
           {o.bonusFromTable ? (
             <p>
@@ -440,11 +461,17 @@ export default function Ilp() {
             />
             <Field id="ilp-sb2-from" label="…paid from annual premium number" value={o.specialBonusLaterFromYear} min={1} max={YEARS + 1} presets={[21]} unverified onChange={(v) => set('specialBonusLaterFromYear', Math.round(v))} />
           </div>
-          <p className="note">
-            Bonuses are added to the account with the premium they belong to. A special bonus is paid only in a year
-            when a premium is paid, so with a {o.iipYears}-year period and no further premiums,{' '}
-            {o.keepPaying ? 'it is paid every year from the starting number' : `premium number ${o.iipYears} is the last that can earn one`}.
-          </p>
+          <ul className="points">
+            <li>
+              <strong>When bonuses are added.</strong> Each bonus is added to the account with the premium it belongs to.
+            </li>
+            <li>
+              <strong>Special bonus needs a premium.</strong> It is paid only in a year when a premium is paid.{' '}
+              {o.keepPaying
+                ? 'You keep paying, so it is paid every year from the starting number.'
+                : `Premiums stop after the ${o.iipYears}-year period, so premium number ${o.iipYears} is the last that can earn one.`}
+            </li>
+          </ul>
         </div>
 
         <div className="panel">
@@ -502,8 +529,8 @@ export default function Ilp() {
             <Field id="diy-n" label="Purchases a year" value={o.diyPurchasesPerYear} min={1} max={12} presets={[1, 2, 4, 12]} onChange={(v) => set('diyPurchasesPerYear', Math.min(12, Math.max(1, Math.round(v))))} />
           </div>
           <p className="note">
-            Purchases a year only sets how many commissions are paid in each year that money goes in. The money itself
-            is treated as invested on the day it is paid, the same as in the ILP.
+            “Purchases a year” only sets how many commissions are paid in each year that money goes in. The money is
+            treated as invested on the day it is paid, as in the ILP.
           </p>
           <button type="button" className="btn" onClick={() => setO({ ...DEFAULTS, tab: o.tab })}>
             Reset everything to the defaults
@@ -517,22 +544,23 @@ export default function Ilp() {
           <ul>
             <li>
               <strong>Insurance cover.</strong> An ILP may include death or other cover that the DIY route does not. The
-              cost of that cover inside the ILP (often called a benefit charge) is not deducted here, and its value is
-              not counted either.
+              cost of that cover (often called a benefit charge) is not deducted here, and its value is not counted.
             </li>
             <li>
               <strong>Early surrender.</strong> Surrender, partial withdrawal, premium holiday and premium reduction
               charges are not modelled, because no year-by-year schedule could be confirmed. Stopping an ILP during its
-              initial investment period usually costs a large part of the account. The figures here assume every
-              premium is paid on time.
+              initial investment period usually costs a large part of the account.
+            </li>
+            <li>
+              <strong>Missed premiums.</strong> The figures assume every premium is paid on time.
             </li>
             <li>
               <strong>Currency and tax.</strong> VWRA trades in US dollars. Currency conversion costs, bid-offer spreads
               and dividend withholding tax inside either fund are not modelled.
             </li>
             <li>
-              <strong>Different investments.</strong> Both routes are given the same return before charges. In practice
-              an ILP’s funds and a world index fund will not return the same.
+              <strong>Different investments.</strong> Both routes are given the same return before charges. An ILP’s
+              funds and a world index fund will not return the same.
             </li>
           </ul>
         </div>
@@ -540,13 +568,25 @@ export default function Ilp() {
 
       <section>
         <h2>Where the defaults come from</h2>
-        <p className="note">
-          The ILP defaults describe a regular-premium investment-linked policy with charges like those of AIA Pro
-          Achiever 3.0. They are taken from write-ups of that product’s published summary dated January 2023. The
-          insurer’s own documents could not be opened when this page was researched on {RESEARCHED_ON}, so{' '}
-          {unverified.length} of the {ILP_DEFAULT_NOTES.length} defaults below are marked unverified. Check them against
-          your own policy illustration and change them above.
-        </p>
+        <ul className="points">
+          <li>
+            <strong>
+              {unverified.length} of the {ILP_DEFAULT_NOTES.length} defaults are unverified.
+            </strong>{' '}
+            The insurer’s own documents could not be opened when this page was researched on {RESEARCHED_ON}.
+          </li>
+          <li>
+            <strong>Check your own policy.</strong> Compare the defaults below with your policy illustration and change
+            them above.
+          </li>
+          <li>
+            <strong>What the defaults describe.</strong> A regular-premium investment-linked policy with charges like
+            those of AIA Pro Achiever 3.0.
+          </li>
+          <li>
+            <strong>Source.</strong> Write-ups of that product’s published summary dated January 2023.
+          </li>
+        </ul>
         <div className="table-scroll">
           <table className="data">
             <thead>

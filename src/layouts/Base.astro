@@ -70,7 +70,7 @@ const canonical = new URL(path, Astro.site);
               Next: <a href={next.href}>{next.question}</a>
             </p>
             <p class="note">
-              {next.title}. Or go back to the <a href="/">full path</a>.
+              {next.title}. Or see <a href="/">every step</a>.
             </p>
           </nav>
         )
@@ -80,11 +80,11 @@ const canonical = new URL(path, Astro.site);
     <footer class="site-foot">
       <div class="wrap flow">
         <p>
-          <strong>Not financial advice.</strong> Hobo Finance is general information for people in Singapore. The tools
-          give estimates from the numbers you enter and from past market data, which does not predict the future. Check
-          important decisions with a licensed adviser.
+          <strong>Not financial advice.</strong> This is general information for people in Singapore. Results are
+          estimates from your numbers and past market data. Past data does not predict the future. Check important
+          decisions with a licensed adviser.
         </p>
-        <p>Nothing you type here leaves your device. Your inputs are saved in this browser only.</p>
+        <p>Nothing you type leaves your device. Inputs are saved in this browser only.</p>
         <div class="foot-actions">
           <button class="btn" id="export-inputs" type="button">Export my inputs</button>
           <button class="btn" id="import-inputs" type="button">Import my inputs</button>

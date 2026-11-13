@@ -39,11 +39,21 @@ export default function LumpSum() {
               <Presets label="Cash interest" options={[0, 1, 2, 3, 4].map((v) => ({ label: `${v}%`, value: v }))} current={o.cashRate} onPick={(v) => setO((p) => ({ ...p, cashRate: v }))} />
             </div>
           </div>
-          <p className="note">
-            You have a sum to invest in the S&amp;P 500 (SPY, dividends reinvested). Either it all goes in on day one, or it
-            goes in equal monthly parts while the rest earns interest. Every month from {first} that leaves room for the
-            full period, up to {last}, is used as a starting point.
-          </p>
+          <ul className="points">
+            <li>
+              <strong>The choice.</strong> You have a sum to invest in the S&amp;P 500 (SPY, dividends reinvested).
+            </li>
+            <li>
+              <strong>Lump sum.</strong> All of it goes in on day one.
+            </li>
+            <li>
+              <strong>Spread out.</strong> It goes in equal monthly parts while the rest earns interest.
+            </li>
+            <li>
+              <strong>Starting months tested.</strong> Every month from {first} to {last} that leaves room for the full
+              period.
+            </li>
+          </ul>
         </div>
       </section>
 
@@ -84,25 +94,45 @@ export default function LumpSum() {
             </tbody>
           </table>
         </div>
-        <p className="note">
-          The two return columns are averages across all starting months. Typical gap compares the two approaches from
-          the same starting month and takes the middle result; a plus sign means the lump sum was ahead. The starting
-          months overlap heavily, and all of them
-          fall between {first.slice(0, 4)} and {last.slice(0, 4)}, so treat the percentages as a guide from one stretch of
-          history, not a law. Longer periods have fewer starting months to test.
-        </p>
+        <ul className="points">
+          <li>
+            <strong>Return columns.</strong> The two return columns are averages across all starting months.
+          </li>
+          <li>
+            <strong>Typical gap.</strong> It compares the two approaches from the same starting month and takes the
+            middle result. A plus sign means the lump sum was ahead.
+          </li>
+          <li>
+            <strong>One period of history.</strong> The starting months overlap heavily, and all fall between{' '}
+            {first.slice(0, 4)} and {last.slice(0, 4)}. Treat the percentages as a guide, not a rule.
+          </li>
+          <li>
+            <strong>Longer periods.</strong> They have fewer starting months to test.
+          </li>
+        </ul>
         <div className="panel">
-          <p>
-            <strong>Putting it all in at once has come out ahead more often than not, and the gap is small either way.</strong>{' '}
-            Markets rise more often than they fall, so money that waits tends to buy at higher prices. Spreading out did
-            better for people who started just before the falls of 2000 and 2008. If investing everything on one day
-            would make you sell at the first fall, spreading it over 6 to 12 months is far better than leaving it in cash
-            for years.
-          </p>
-          <p className="note">
-            This is about a sum you already have. Investing part of each month’s pay as it arrives is a different thing,
-            and is simply investing as early as you can.
-          </p>
+          <ul className="points">
+            <li>
+              <strong>Lump sum was ahead more often.</strong> Putting it all in at once has come out ahead more often
+              than not. The gap is small either way.
+            </li>
+            <li>
+              <strong>Why.</strong> Markets rise more often than they fall, so money that waits tends to buy at higher
+              prices.
+            </li>
+            <li>
+              <strong>When spreading out did better.</strong> For people who started just before the falls of 2000 and
+              2008.
+            </li>
+            <li>
+              <strong>If a fall would make you sell.</strong> Spread the sum over 6 to 12 months. That is better than
+              leaving it in cash for years.
+            </li>
+            <li>
+              <strong>A sum you already have.</strong> This page is about a sum you already have. Investing part of each
+              month’s pay as it arrives is different: it is investing as early as you can.
+            </li>
+          </ul>
         </div>
       </section>
     </div>

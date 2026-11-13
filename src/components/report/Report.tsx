@@ -152,7 +152,7 @@ function FireSection({ yours }: { yours: boolean }) {
       <h3>
         FIRE and CPF bridge {!yours && <span className="tag-unsure">example figures</span>}
       </h3>
-      <p className="note">Can my savings carry me to 55, when CPF opens up?</p>
+      <p className="note">Can my savings pay for the years until 55, when CPF can be withdrawn?</p>
       <div className="report-pair">
         <div className="table-scroll">
           <table className="data">
@@ -249,8 +249,8 @@ function FireSection({ yours }: { yours: boolean }) {
         </table>
       </div>
       <p className="note">
-        In today’s dollars, with work stopping {stopMonth === null ? 'never (no stop-work age was found)' : `at ${ageText(firstAge + stopMonth)}`}. This is a
-        simplified model: returns are steady and CPF LIFE payouts are left out. See the planner page for every assumption.
+        In today’s dollars, with work stopping {stopMonth === null ? 'never (no stop-work age was found)' : `at ${ageText(firstAge + stopMonth)}`}. Returns
+        are steady and CPF LIFE payouts are left out. The planner page lists every assumption.
       </p>
     </section>
   );
@@ -289,8 +289,8 @@ export default function Report() {
           <p>
             <strong>{filled === 0 ? 'You have not filled in any pages yet.' : `This report uses your figures from ${filled} ${filled === 1 ? 'page' : 'pages'}.`}</strong>{' '}
             {filled === 0
-              ? 'The report below uses the starting examples. Work through Start here, then come back.'
-              : 'Change a number on any page and reload this one to update it.'}
+              ? 'Work through Start here, then come back. Until then the report shows the starting examples.'
+              : 'To update it, change a number on any page and reload this one.'}
           </p>
           <label className="check">
             <input type="checkbox" checked={onlyMine} disabled={filled === 0} onChange={(e) => setOnlyMine(e.target.checked)} />

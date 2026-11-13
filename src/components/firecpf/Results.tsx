@@ -50,13 +50,25 @@ export default function Results({ plan, inputs, calc }: { plan: PlanState; input
           ) : (
             <p>{when(fire.month)}.</p>
           )}
-          <p className="note">
-            This is the first month in which both of these are true. First, the liquid portfolio alone pays the target
-            spending from that month until {couple ? 'the younger of you turns' : 'you turn'} 55, without running out.
-            Second, the liquid portfolio plus CPF (leaving out MediSave, which can only pay medical costs) at 55 is at
-            least the yearly spending divided by the withdrawal rate. If work stops after 55, the second test is made
-            on the day work stops.
-          </p>
+          <ul className="points">
+            <li>
+              <strong>How it is found.</strong> This is the first month in which both tests below pass.
+            </li>
+            <li>
+              <strong>First test.</strong> The liquid portfolio alone pays the target spending from that month until{' '}
+              {couple ? 'the younger of you turns' : 'you turn'} 55, without running out.
+            </li>
+            <li>
+              <strong>Second test.</strong> The liquid portfolio plus CPF at 55 is at least the yearly spending divided by the
+              withdrawal rate.
+            </li>
+            <li>
+              <strong>MediSave is left out.</strong> It can only pay medical costs, so the second test does not count it.
+            </li>
+            <li>
+              <strong>Stopping after 55.</strong> The second test is made on the day work stops.
+            </li>
+          </ul>
         </div>
 
         {plan.stopMode === 'age' && chosen && (
@@ -128,7 +140,7 @@ export default function Results({ plan, inputs, calc }: { plan: PlanState; input
             </tbody>
           </table>
         </div>
-        <p className="note">Same inputs, with only the expected return changed. CPFIS investments follow the same return less the fee.</p>
+        <p className="note">Only the expected return changes; every other input stays the same. CPFIS investments earn the same return less the fee.</p>
       </section>
 
       <section>
@@ -153,11 +165,15 @@ export default function Results({ plan, inputs, calc }: { plan: PlanState; input
             </tbody>
           </table>
         </div>
-        <p className="note">
-          In today’s dollars, with work stopping{' '}
-          {calc.stopMonth === null ? 'never (no stop-work age was found, so the plan assumes work continues)' : `in ${date(calc.stopMonth)}`}. “All
-          CPF” counts OA, CPFIS, Special or Retirement Account and MediSave.
-        </p>
+        <ul className="points">
+          <li>
+            <strong>Today’s dollars.</strong>{' '}
+            {calc.stopMonth === null ? 'No stop-work age was found, so the plan assumes work never stops.' : `Work stops in ${date(calc.stopMonth)}.`}
+          </li>
+          <li>
+            <strong>All CPF.</strong> This counts OA, CPFIS, Special or Retirement Account and MediSave.
+          </li>
+        </ul>
       </section>
 
       <section>
@@ -170,8 +186,8 @@ export default function Results({ plan, inputs, calc }: { plan: PlanState; input
         )}
         {sim.shortMonths.length > 0 && (
           <p className="warn">
-            The liquid portfolio cannot pay for everything in this plan. The first month with a gap is {date(sim.shortMonths[0])}.
-            See the notes column.
+            The liquid portfolio cannot pay for everything in this plan. The first shortfall is in {date(sim.shortMonths[0])};
+            see the Notes column.
           </p>
         )}
         {chartRows.length > 0 && (
@@ -196,7 +212,7 @@ export default function Results({ plan, inputs, calc }: { plan: PlanState; input
             <p className="note">
               <span className="swatch" style={{ background: 'var(--c1)' }} />
               Liquid portfolio, stacked on <span className="swatch" style={{ background: 'var(--c4)', marginLeft: '0.3em' }} />
-              CPF (all accounts). The top edge is net worth. Today’s dollars, by {couple ? 'person 1’s age' : 'age'}.
+              CPF (all accounts); the top edge is net worth. In today’s dollars, by {couple ? 'person 1’s age' : 'age'}.
             </p>
           </div>
         )}
@@ -237,11 +253,20 @@ export default function Results({ plan, inputs, calc }: { plan: PlanState; input
             </tbody>
           </table>
         </div>
-        <p className="note">
-          Each row is the position at that date, in today’s dollars. Spending drawn and the notes cover the 12 months
-          before it. SA or RA is the Special Account before 55 and the Retirement Account after. Net worth is the
-          liquid portfolio plus total CPF; it leaves out your home and the mortgage on it.
-        </p>
+        <ul className="points">
+          <li>
+            <strong>Each row.</strong> The position at that date, in today’s dollars.
+          </li>
+          <li>
+            <strong>Spending drawn and notes.</strong> These cover the 12 months before that date.
+          </li>
+          <li>
+            <strong>SA or RA.</strong> The Special Account before 55 and the Retirement Account after.
+          </li>
+          <li>
+            <strong>Net worth.</strong> The liquid portfolio plus total CPF. It leaves out your home and the mortgage on it.
+          </li>
+        </ul>
       </section>
     </>
   );

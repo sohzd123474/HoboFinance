@@ -158,7 +158,7 @@ export default function Ssb() {
         </ul>
       </div>
     ) : (
-      <p className="note">No months are missing: there is an issue for every month in the range.</p>
+      <p className="note">No months are missing. Every month in the range has an issue.</p>
     );
 
   if (rows.length === 0) {
@@ -166,7 +166,7 @@ export default function Ssb() {
       <div className="tool">
         <section>
           <h2>No Savings Bond data</h2>
-          <p className="warn">The data file has no issues in it, so nothing can be shown.</p>
+          <p className="warn">The data file has no issues, so there is nothing to show.</p>
           {missingBlock}
           {sourceLine}
         </section>
@@ -186,7 +186,7 @@ export default function Ssb() {
   const result = compare(chosen.issue.coupons, amount, holdYears, oaRate, reinvestRate);
   const paid = yearlyInterest(chosen.issue.coupons, amount);
   const moreOrLess = (diff: number) => (Math.abs(diff) < 0.5 ? 'the same as' : `${sgd(Math.abs(diff))} ${diff > 0 ? 'more than' : 'less than'}`);
-  const verdict = `Over ${years(result.years)}, ${sgd(amount)} in the ${monthName(chosen.month)} issue pays ${moreOrLess(result.keptMinusOa)} leaving the money in OA at ${plain(oaRate)} if you keep the interest as cash, and ${moreOrLess(result.reinvestedMinusOa)} OA if you reinvest the interest at ${plain(reinvestRate)}.`;
+  const verdict = `Over ${years(result.years)}, ${sgd(amount)} in the ${monthName(chosen.month)} issue pays ${moreOrLess(result.keptMinusOa)} CPF OA at ${plain(oaRate)} if you keep the interest as cash. It pays ${moreOrLess(result.reinvestedMinusOa)} OA if you reinvest the interest at ${plain(reinvestRate)}.`;
 
   const chartRows = rows.map((r) => ({ month: r.month, simpleTen: Number(r.simpleTen.toFixed(3)), ten: r.ten, year1: r.year1 }));
   const SERIES = [
@@ -262,12 +262,23 @@ export default function Ssb() {
             </tbody>
           </table>
         </div>
-        <p className="note">
-          MAS’s average return is a compounded rate: the single yearly rate worth the same as the stepped-up interest.
-          “Interest per year, not compounded” is total interest divided by years held; it is the figure to set against
-          the last column, which is the flat rate a bond must pay out to end level with OA at {plain(oaRate)} compounded
-          yearly. Change the OA rate in the calculator below.
-        </p>
+        <ul className="points">
+          <li>
+            <strong>MAS average return.</strong> A compounded rate. It is the single yearly rate worth the same as the
+            stepped-up interest.
+          </li>
+          <li>
+            <strong>Interest per year, not compounded.</strong> Total interest divided by years held. Compare it with
+            the last column.
+          </li>
+          <li>
+            <strong>Needed to match OA.</strong> The flat rate a bond must pay out to equal OA at {plain(oaRate)}{' '}
+            compounded yearly.
+          </li>
+          <li>
+            <strong>Change the OA rate.</strong> Set it in the calculator below.
+          </li>
+        </ul>
       </section>
 
       <section>
@@ -306,8 +317,11 @@ export default function Ssb() {
             </span>
           ))}{' '}
           <span className="swatch" style={{ background: 'var(--c3)' }} />
-          Flat line: {rate(breakEven10)} a year, the interest a bond must pay out, uncompounded, to end 10 years level
-          with CPF OA at {plain(oaRate)} compounded. Compare it with the first line, not the dashed one.
+          Flat line: {rate(breakEven10)} a year.
+        </p>
+        <p className="note">
+          A bond must pay the flat-line rate, not compounded, to equal CPF OA at {plain(oaRate)} compounded over 10
+          years. Compare it with the first line, not the dashed one.
         </p>
 
         <div className="table-scroll">
@@ -363,13 +377,26 @@ export default function Ssb() {
             </tbody>
           </table>
         </div>
-        <p className="note">
-          {rows.length} issues, {monthName(rows[0].month)} to {monthName(latest.month)}, newest first. “Change from
-          previous month” is the change in the 10-year average from the issue before it. “Beat OA over 10 years?” asks
-          whether the bond’s total interest, kept as cash, is more than OA at {plain(oaRate)} compounded yearly would
-          earn; the last column asks the same with the interest reinvested at {plain(reinvestRate)}. Both use the rates
-          set in the calculator below and hold the OA rate flat for 10 years.
-        </p>
+        <ul className="points">
+          <li>
+            <strong>{rows.length} issues, newest first.</strong> {monthName(rows[0].month)} to {monthName(latest.month)}.
+          </li>
+          <li>
+            <strong>Change from previous month.</strong> The change in the 10-year average from the issue before it.
+          </li>
+          <li>
+            <strong>Beat OA over 10 years?</strong> Yes if the bond’s total interest, kept as cash, is more than OA at{' '}
+            {plain(oaRate)} compounded yearly would earn.
+          </li>
+          <li>
+            <strong>With interest reinvested?</strong> The same test with the interest reinvested at{' '}
+            {plain(reinvestRate)}.
+          </li>
+          <li>
+            <strong>Rates used.</strong> Both tests use the rates set in the calculator below. The OA rate stays flat
+            for 10 years.
+          </li>
+        </ul>
         {missingBlock}
       </section>
 
@@ -398,7 +425,7 @@ export default function Ssb() {
               />
             </div>
             <div>
-              <label htmlFor="ssb-reinvest">Rate earned on reinvested interest (% a year)</label>
+              <label htmlFor="ssb-reinvest">Reinvestment rate (% a year)</label>
               <PercentInput id="ssb-reinvest" value={reinvestRate} onChange={(v) => set('reinvestRate', v)} />
               <Presets
                 label="Reinvestment rate"
@@ -435,8 +462,8 @@ export default function Ssb() {
         {amount <= 0 && <p className="warn">Enter an amount above 0.</p>}
         {amount > SSB_HOLDING_LIMIT && (
           <p className="warn">
-            One person can hold at most {sgd(SSB_HOLDING_LIMIT)} of Savings Bonds (<a href={SRC.masInvesting}>MAS</a>), so{' '}
-            {sgd(amount)} could not all go into them.
+            One person can hold at most {sgd(SSB_HOLDING_LIMIT)} of Savings Bonds (<a href={SRC.masInvesting}>MAS</a>).{' '}
+            {sgd(amount)} is over that limit. Enter {sgd(SSB_HOLDING_LIMIT)} or less.
           </p>
         )}
 
@@ -504,12 +531,26 @@ export default function Ssb() {
             </tbody>
           </table>
         </div>
-        <p className="note">
-          Uses the {monthName(chosen.month)} issue ({chosen.issue.code}), counted from its issue date. “Interest kept as
-          cash” assumes the interest earns nothing after it is paid. “Reinvested” assumes each six-monthly payment earns
-          the reinvestment rate, compounded yearly, from the day it is paid. OA is one deposit left untouched at a flat
-          rate; CPF computes interest monthly and credits it once a year. Amounts are rounded to the dollar.
-        </p>
+        <ul className="points">
+          <li>
+            <strong>Issue used.</strong> The {monthName(chosen.month)} issue ({chosen.issue.code}), counted from its
+            issue date.
+          </li>
+          <li>
+            <strong>Interest kept as cash.</strong> The interest earns nothing after it is paid.
+          </li>
+          <li>
+            <strong>Interest reinvested.</strong> Each six-monthly payment earns the reinvestment rate, compounded
+            yearly, from the day it is paid.
+          </li>
+          <li>
+            <strong>CPF OA.</strong> One deposit left untouched at a flat rate. CPF computes interest monthly and
+            credits it once a year.
+          </li>
+          <li>
+            <strong>Rounding.</strong> Amounts are rounded to the dollar.
+          </li>
+        </ul>
       </section>
 
       <section>
@@ -545,10 +586,18 @@ export default function Ssb() {
             </tbody>
           </table>
         </div>
-        <p className="note">
-          The rules in this table were read from the linked MAS and CPF Board pages on {CHECKED_ON} and can change.
-          Rows marked n/a were not checked. This page is general information, not advice.
-        </p>
+        <ul className="points">
+          <li>
+            <strong>Checked on {CHECKED_ON}.</strong> The rules were read from the linked MAS and CPF Board pages. They
+            can change.
+          </li>
+          <li>
+            <strong>Rows marked n/a.</strong> These were not checked.
+          </li>
+          <li>
+            <strong>Not advice.</strong> This page is general information.
+          </li>
+        </ul>
         {sourceLine}
       </section>
     </div>

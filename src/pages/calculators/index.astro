@@ -2,12 +2,34 @@
 import Base from '../../layouts/Base.astro';
 import LinkList from '../../components/LinkList.astro';
 import { calculators } from '../../lib/calculators';
+import { stages } from '../../lib/stages';
+
+const blurb = (href: string) => calculators.find((c) => `/calculators/${c.slug}/` === href)?.blurb ?? '';
+const groups = stages
+  .map((s) => ({ title: s.title, items: s.steps.filter((x) => x.href.startsWith('/calculators/')).map((x) => ({ href: x.href, title: x.title, blurb: blurb(x.href) })) }))
+  .filter((g) => g.items.length > 0);
 ---
 
 <Base title="Basic calculators" description="Free calculators for compound interest, loans, savings goals and financial independence.">
   <div class="wrap page-head">
     <h1>Basic calculators</h1>
-    <p class="lede">Change any number and the answer updates as you type. Pick your currency at the top of the page.</p>
-    <LinkList items={calculators.map((c) => ({ href: `/calculators/${c.slug}/`, title: c.title, blurb: c.blurb }))} />
+    <p class="lede">Pick a calculator and change any number. The answer updates as you type.</p>
+    {
+      groups.map((g) => (
+        <section class="group">
+          <h2>{g.title}</h2>
+          <LinkList items={g.items} />
+        </section>
+      ))
+    }
   </div>
 </Base>
+
+<style>
+  .group {
+    margin-top: 2rem;
+  }
+  .group h2 {
+    font-size: var(--step-1);
+  }
+</style>

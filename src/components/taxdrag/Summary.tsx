@@ -34,7 +34,7 @@ export default function Summary() {
   ];
 
   const breakEvenText = !irish || !breakEven
-    ? `n/a: it applies only when one fund is US-domiciled and the other is Ireland-domiciled; both are ${a.etf.domicile === 'IE' ? 'Ireland' : 'US'}-domiciled`
+    ? `n/a: both funds are ${a.etf.domicile === 'IE' ? 'Ireland' : 'US'}-domiciled. It needs one US-domiciled fund and one Ireland-domiciled fund`
     : breakEven.ok
       ? sgd(breakEven.size)
       : `n/a: ${breakEven.reason} (${pct(irish.drag, 3)} for ${irish.etf.ticker} against ${pct(other.drag, 3)} for ${other.etf.ticker})`;

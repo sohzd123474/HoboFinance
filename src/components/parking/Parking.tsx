@@ -12,7 +12,7 @@ const BOOKS = [
   {
     title: 'The Little Book of Common Sense Investing',
     author: 'John C. Bogle',
-    why: 'Makes the case for buying a low-cost index fund and holding it, by the person who started the first one.',
+    why: 'Argues for buying a low-cost index fund and holding it. Written by the person who started the first one.',
   },
   {
     title: 'The Psychology of Money',
@@ -32,7 +32,7 @@ const TOOLS = [
   { name: 'Macrotrends', url: 'https://www.macrotrends.net/', use: 'Long-run charts of company financials, prices and economic series.' },
   { name: 'Koyfin', url: 'https://www.koyfin.com/', use: 'Charts and financial data for shares, funds and markets.' },
   { name: 'FRED', url: 'https://fred.stlouisfed.org/', use: 'Economic data series from the Federal Reserve Bank of St. Louis: interest rates, inflation, employment.' },
-  { name: 'Finviz', url: 'https://finviz.com/', use: 'Screen US shares and see the market at a glance on a heat map.' },
+  { name: 'Finviz', url: 'https://finviz.com/', use: 'Screen US shares and view the whole market on a heat map.' },
 ];
 
 export default function Parking() {
@@ -48,11 +48,11 @@ export default function Parking() {
         <div className="panel">
           <p>
             <strong>
-              Money you need within about 2 years belongs in Singapore Savings Bonds, T-bills or a money market fund,
-              not in shares.
+              Keep money you need within about 2 years in Singapore Savings Bonds, T-bills or a money market fund, not
+              in shares.
             </strong>
           </p>
-          <p>Shares can fall by a third or more and take years to recover, which is longer than you can wait.</p>
+          <p>Shares can fall by a third or more and take years to recover. You cannot wait that long.</p>
         </div>
       </section>
 
@@ -103,8 +103,8 @@ export default function Parking() {
           ))}
           <p className="note">
             The {PLACEHOLDER_RATE.toFixed(1)}% rates are placeholders, not today’s rates. Enter today’s rate for each
-            option: see the <a href={MAS_SSB}>MAS Savings Bonds page</a> and the <a href={MAS_TBILL}>MAS T-bills page</a>
-            , and your fund’s own page for a money market fund.
+            option from the <a href={MAS_SSB}>MAS Savings Bonds page</a>, the <a href={MAS_TBILL}>MAS T-bills page</a>{' '}
+            or your money market fund’s own page.
           </p>
           <button type="button" className="btn" onClick={() => setO(DEFAULTS)}>
             Reset
@@ -141,13 +141,26 @@ export default function Parking() {
             </tbody>
           </table>
         </div>
-        <p className="note">
-          {sgd(o.amount)} held for {months} {months === 1 ? 'month' : 'months'}. Simple interest is amount × rate ×
-          months ÷ 12, used for T-bills because they pay nothing until they mature. Monthly compounding adds interest to
-          the balance each month, used for the other two by default. These are estimates: Savings Bonds pay a rate that
-          steps up each year and pay it out every six months, a T-bill runs for a fixed 6 or 12 months, and a money
-          market fund’s rate changes daily and is not guaranteed.
-        </p>
+        <ul className="points">
+          <li>
+            <strong>What is shown.</strong> {sgd(o.amount)} held for {months} {months === 1 ? 'month' : 'months'}.
+          </li>
+          <li>
+            <strong>Simple interest.</strong> Amount × rate × months ÷ 12. Used for T-bills because they pay nothing
+            until they mature.
+          </li>
+          <li>
+            <strong>Monthly compounding.</strong> Adds interest to the balance each month. Used for the other two
+            options by default.
+          </li>
+          <li>
+            <strong>These are estimates.</strong> Savings Bonds pay a rate that steps up each year, paid out every six
+            months. A T-bill runs for a fixed 6 or 12 months.
+          </li>
+          <li>
+            <strong>Money market funds.</strong> The rate changes daily and is not guaranteed.
+          </li>
+        </ul>
       </section>
 
       <section>

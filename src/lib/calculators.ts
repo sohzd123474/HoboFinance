@@ -36,7 +36,8 @@ export interface Calculator {
   blurb: string;
   fields: Field[];
   compute: (v: Record<string, number>) => Result;
-  explain: string[];
+  /** Short points under a heading: each point is a bold lead and one or two sentences. Five points at most per group. */
+  explain: { title: string; points: [string, string][] }[];
 }
 
 /**
@@ -77,7 +78,7 @@ export const calculators: Calculator[] = [
   {
     slug: 'compound-interest',
     title: 'Compound interest',
-    blurb: 'See what regular saving grows into once interest starts earning interest.',
+    blurb: 'Enter a monthly amount and a rate to see what your savings grow into.',
     fields: [
       { id: 'principal', label: 'Starting amount', unit: 'money', value: 1000, min: 0, max: 100000000, step: 100, presets: [0, 1000, 10000, 50000] },
       { id: 'monthly', label: 'Added each month', unit: 'money', value: 200, min: 0, max: 1000000, step: 10, presets: [100, 200, 500, 1000, 2000] },
@@ -97,17 +98,23 @@ export const calculators: Calculator[] = [
       };
     },
     explain: [
-      'Each month the balance grows by one twelfth of the yearly rate, then your monthly amount is added. Growth is worked out on the whole balance, including earlier growth, which is why the curve bends upward.',
-      'The rate is a steady average. Real investments move up and down from year to year, and fees and tax are not included.',
+      {
+        title: 'How this is worked out',
+        points: [
+          ['How it grows.', 'Each month the balance grows by one twelfth of the yearly rate. Then your monthly amount is added.'],
+          ['Why the curve bends upward.', 'Growth is worked out on the whole balance, including earlier growth.'],
+          ['What is left out.', 'Fees and tax. The rate is a steady average; real investments rise and fall from year to year.'],
+        ],
+      },
     ],
   },
   {
     slug: 'loan-repayment',
     title: 'Loan repayment',
-    blurb: 'Work out the monthly repayment on a home, car or personal loan, and what it costs in interest.',
+    blurb: 'Enter a loan to see the monthly repayment and the total interest.',
     fields: [
       { id: 'amount', label: 'Amount borrowed', unit: 'money', value: 300000, min: 100, max: 100000000, step: 1000, presets: [20000, 100000, 300000, 500000, 800000] },
-      { id: 'rate', label: 'Advertised interest rate', unit: 'percent', value: 4, min: 0, max: 40, step: 0.05, hint: 'The yearly rate charged on what you still owe, which is how home loans are quoted. For a car or personal loan quoted as a flat rate, use the flat-rate loan calculator.', presets: [2.6, 3, 3.5, 4, 5] },
+      { id: 'rate', label: 'Advertised interest rate', unit: 'percent', value: 4, min: 0, max: 40, step: 0.05, hint: 'The yearly rate on what you still owe. Home loans are quoted this way. For a flat-rate car or personal loan, use the flat-rate loan calculator.', presets: [2.6, 3, 3.5, 4, 5] },
       { id: 'years', label: 'Loan length', unit: 'years', value: 25, min: 1, max: 40, step: 1, presets: [5, 7, 15, 25, 30] },
       { id: 'fee', label: 'Fees taken upfront', unit: 'money', value: 0, min: 0, max: 1000000, step: 100, hint: 'Processing or legal fees deducted from the loan or paid at the start.', presets: [0, 500, 2000, 5000] },
     ],
@@ -125,15 +132,21 @@ export const calculators: Calculator[] = [
       };
     },
     explain: [
-      'This is a reducing-balance loan with equal monthly repayments. Interest is charged each month on what you still owe, so early repayments are mostly interest and later ones mostly pay off the loan.',
-      'The effective interest rate (EIR) is the true yearly cost once monthly compounding and upfront fees are counted. On a loan charged on the falling balance it sits a little above the advertised rate: 4% advertised is 4.07% effective before fees. Use the EIR to compare one loan with another.',
-      'It assumes the rate stays the same for the whole loan and leaves out insurance. Flat-rate loans, common for cars and personal loans, are worked out differently and cost far more than the same advertised rate here; they have their own calculator.',
+      {
+        title: 'How this is worked out',
+        points: [
+          ['Equal monthly repayments.', 'Interest is charged each month on what you still owe. Early repayments are mostly interest; later ones mostly pay off the loan.'],
+          ['Compare loans by EIR.', 'The effective interest rate is the yearly cost once monthly compounding and upfront fees are counted. 4% advertised is 4.07% effective before fees.'],
+          ['What is left out.', 'Insurance, and any change in the rate during the loan.'],
+          ['Car or personal loan?', 'Those are usually quoted as a flat rate, which costs more than the same advertised rate here. Use the flat-rate loan calculator.'],
+        ],
+      },
     ],
   },
   {
     slug: 'savings-goal',
     title: 'Savings goal',
-    blurb: 'Find the monthly amount that gets you to a target by a date you choose.',
+    blurb: 'Enter a target and a date to see how much to save each month.',
     fields: [
       { id: 'target', label: 'Target amount', unit: 'money', value: 50000, min: 1, max: 100000000, step: 500, presets: [10000, 50000, 100000, 500000] },
       { id: 'current', label: 'Saved so far', unit: 'money', value: 5000, min: 0, max: 100000000, step: 100, presets: [0, 5000, 20000, 50000] },
@@ -154,14 +167,20 @@ export const calculators: Calculator[] = [
       };
     },
     explain: [
-      'First your existing savings are grown for the full period. Whatever is still missing is spread into equal monthly deposits, allowing for the interest those deposits earn along the way.',
-      'Prices rise over time. For a goal several years away, raise the target a little or use a lower interest rate to allow for that.',
+      {
+        title: 'How this is worked out',
+        points: [
+          ['What you have counts first.', 'Your existing savings are grown for the full period.'],
+          ['The rest is split evenly.', 'The shortfall becomes equal monthly deposits, allowing for the interest those deposits earn.'],
+          ['Allow for rising prices.', 'For a goal several years away, raise the target or use a lower interest rate.'],
+        ],
+      },
     ],
   },
   {
     slug: 'financial-independence',
     title: 'Financial independence',
-    blurb: 'Estimate the pot you need to live off your investments, and how many years of saving it takes.',
+    blurb: 'Enter your yearly spending to see the pot you need and the years it takes to save it.',
     fields: [
       { id: 'spend', label: 'Yearly spending', unit: 'money', value: 36000, min: 1, max: 10000000, step: 500, presets: [24000, 36000, 48000, 60000, 90000] },
       { id: 'withdrawal', label: 'Withdrawal rate', unit: 'percent', value: 4, min: 1, max: 10, step: 0.1, hint: 'Share of the pot you spend each year. 4% is the usual starting point.', presets: [3, 3.5, 4, 5] },
@@ -184,14 +203,21 @@ export const calculators: Calculator[] = [
       };
     },
     explain: [
-      'The pot is your yearly spending divided by the withdrawal rate: at 4%, that is 25 times what you spend in a year. The time is how long your monthly investing takes to grow to that pot.',
-      'Using a return after inflation keeps every figure in today’s money. The 4% rate comes from studies of 30-year retirements in US markets; a longer retirement or different markets may call for a lower rate.',
+      {
+        title: 'How this is worked out',
+        points: [
+          ['The pot you need.', 'Yearly spending divided by the withdrawal rate. At 4%, that is 25 times what you spend in a year.'],
+          ['The time it takes.', 'How long your monthly investing takes to grow to that pot.'],
+          ['Use a return after inflation.', 'That keeps every figure in today’s money.'],
+          ['Where 4% comes from.', 'Studies of 30-year retirements in US markets. A longer retirement or different markets may call for a lower rate.'],
+        ],
+      },
     ],
   },
   {
     slug: 'early-retirement',
     title: 'Early retirement',
-    blurb: 'How many years until you can stop working, based on how much of your income you save.',
+    blurb: 'Enter your pay and the share you save to see how many years until you can stop working.',
     fields: [
       { id: 'income', label: 'Take-home pay a year', unit: 'money', value: 60000, min: 1, max: 10000000, step: 1000, presets: [36000, 60000, 84000, 120000, 180000] },
       { id: 'rate', label: 'Share of pay you save', unit: 'percent', value: 30, min: 0, max: 99, step: 1, presets: [10, 20, 30, 50, 70] },
@@ -243,16 +269,30 @@ export const calculators: Calculator[] = [
       };
     },
     explain: [
-      'Whatever you do not save, you spend. The pot you need is that yearly spending divided by the withdrawal rate. Saving more helps twice: the pot grows faster and the target gets smaller, because you have shown you can live on less.',
-      'CPF is saving you are made to do. An employee aged 55 or under puts in 20% of their wage and the employer adds another 17%, so 37% of the wage is saved before any of it reaches the bank account. Someone who saves nothing from take-home pay is still saving about 32% of everything they earn (37 out of 117), and someone who saves 30% of take-home pay is really saving about 52%. Choose “Employee, 55 or under” above to count it.',
-      'Counting CPF makes the answer optimistic in two ways. CPF savings cannot be spent before 55, and only the part above your retirement sum can be withdrawn then, so they cannot fund the years before that. And CPF earns its own rates (2.5% in the Ordinary Account, about 4% in the others), not the return entered here. The rates apply up to the monthly wage ceiling and are lower above age 55.',
-      'It assumes your pay and spending stay the same in today’s money, and that returns arrive evenly.',
+      {
+        title: 'How this is worked out',
+        points: [
+          ['The pot you need.', 'Whatever you do not save, you spend. The pot is that yearly spending divided by the withdrawal rate.'],
+          ['Saving more helps twice.', 'The pot grows faster, and the target gets smaller because you live on less.'],
+          ['What is assumed.', 'Pay and spending stay the same in today’s money, and returns arrive evenly.'],
+        ],
+      },
+      {
+        title: 'Counting CPF',
+        points: [
+          ['CPF is saving you already do.', 'An employee aged 55 or under puts in 20% of their wage and the employer adds 17%. That is 37% of the wage saved before pay reaches the bank.'],
+          ['Your true saving rate is higher.', 'Saving nothing from take-home pay still saves about 32% of everything you earn (37 out of 117). Saving 30% of take-home pay saves about 52%.'],
+          ['To count it.', 'Choose “Employee, 55 or under” above.'],
+          ['CPF is locked until 55.', 'Only the part above your retirement sum can be withdrawn then. It cannot pay for the years before 55, so counting it makes the answer optimistic.'],
+          ['CPF earns its own rates.', '2.5% in the Ordinary Account and about 4% in the others, not the return entered here. Contribution rates apply up to the monthly wage ceiling and are lower above age 55.'],
+        ],
+      },
     ],
   },
   {
     slug: 'recurring-cost',
     title: 'Recurring cost',
-    blurb: 'What a regular expense really costs over time, and the capital that would pay for it from investment income.',
+    blurb: 'Enter a regular expense to see its long-run cost and the capital that would pay for it.',
     fields: [
       { id: 'amount', label: 'Cost each time', unit: 'money', value: 20, min: 0.01, max: 1000000, step: 1, presets: [5, 10, 20, 50, 100, 500] },
       {
@@ -292,14 +332,21 @@ export const calculators: Calculator[] = [
       };
     },
     explain: [
-      'The capital that makes it free is the yearly cost divided by the income rate: at 4%, that is 25 times the yearly cost. Invested capital of that size pays the expense from its income, leaving the capital itself untouched.',
-      'Worth if invested instead is what the same payments would grow to if you put them into investments each month at the return you chose. Dividends and returns are not guaranteed, prices rise over time, and dividends may be taxed depending on where the fund is based.',
+      {
+        title: 'How this is worked out',
+        points: [
+          ['Capital that makes it free.', 'The yearly cost divided by the income rate. At 4%, that is 25 times the yearly cost.'],
+          ['How that works.', 'Capital of that size pays the expense from its income. The capital itself is not spent.'],
+          ['Worth if invested instead.', 'What the same payments would grow to if invested each month at the return you chose.'],
+          ['What is not guaranteed.', 'Dividends and returns. Prices also rise over time, and dividends may be taxed depending on where the fund is based.'],
+        ],
+      },
     ],
   },
   {
     slug: 'dollar-at-retirement',
     title: 'What a dollar becomes',
-    blurb: 'What money set aside today is worth by the time you retire, at six different rates of return.',
+    blurb: 'Enter your age and an amount to see what it is worth at retirement, at six rates of return.',
     fields: [
       { id: 'amount', label: 'Amount today', unit: 'money', value: 1, min: 0.01, max: 100000000, step: 1, presets: [1, 100, 1000, 10000, 100000] },
       { id: 'age', label: 'Your age', unit: 'years', value: 30, min: 0, max: 99, step: 1, presets: [{ label: '20', value: 20 }, { label: '25', value: 25 }, { label: '30', value: 30 }, { label: '35', value: 35 }, { label: '40', value: 40 }, { label: '50', value: 50 }] },
@@ -316,14 +363,28 @@ export const calculators: Calculator[] = [
       };
     },
     explain: [
-      'Each line is the amount multiplied by (1 + rate) once for every year until you retire, with nothing added along the way. The same sum grows very differently depending on the rate, and the gap widens with every extra year.',
-      'The rates are examples, not promises. 2.5% and 4% are the current floor rates on CPF accounts. 7% is close to what the S&P 500 has returned after inflation over the long run and 10% before inflation. 15% a year has happened over single decades but has never lasted a working lifetime. Amounts are not adjusted for rising prices.',
+      {
+        title: 'How this is worked out',
+        points: [
+          ['Each line.', 'The amount is multiplied by (1 + rate) once for every year until you retire. Nothing is added along the way.'],
+          ['The rate matters more each year.', 'The gap between the lines widens with every extra year.'],
+          ['What is left out.', 'Rising prices. The rates are examples, not promises.'],
+        ],
+      },
+      {
+        title: 'Where the rates come from',
+        points: [
+          ['2.5% and 4%.', 'The current floor rates on CPF accounts.'],
+          ['7% and 10%.', 'Close to what the S&P 500 has returned over the long run: 7% after inflation, 10% before.'],
+          ['15%.', 'Has happened over single decades. It has never lasted a working lifetime.'],
+        ],
+      },
     ],
   },
   {
     slug: 'budget',
     title: 'Budget split',
-    blurb: 'Split your monthly pay into needs, wants and savings, starting from the 50/30/20 guideline.',
+    blurb: 'Enter your monthly pay to split it into needs, wants and savings.',
     fields: [
       { id: 'pay', label: 'Take-home pay a month', unit: 'money', value: 4000, min: 1, max: 10000000, step: 100, presets: [2500, 4000, 6000, 8000, 12000] },
       { id: 'needs', label: 'Needs', unit: 'percent', value: 50, min: 0, max: 100, step: 1, hint: 'Rent or mortgage, bills, groceries, transport to work.', presets: [40, 50, 60, 70] },
@@ -346,17 +407,24 @@ export const calculators: Calculator[] = [
       };
     },
     explain: [
-      'The 50/30/20 guideline puts half of take-home pay towards needs, 30% towards wants and 20% towards saving and investing. It is a starting point for seeing where your money goes, not a rule to follow exactly.',
-      'Track what you actually spend for a month and adjust the shares to match your life. Raising the saved share over time is what moves the date you can stop working. CPF contributions come on top of this, because they are taken before your pay reaches you.',
+      {
+        title: 'How this is worked out',
+        points: [
+          ['The 50/30/20 guideline.', 'Half of take-home pay to needs, 30% to wants, 20% to saving and investing. It is a starting point, not a rule.'],
+          ['Make it yours.', 'Track what you spend for one month, then change the shares to match.'],
+          ['Raise the saved share over time.', 'That brings forward the date you can stop working.'],
+          ['CPF is extra.', 'Contributions are taken before your pay reaches you, so they come on top of this.'],
+        ],
+      },
     ],
   },
   {
     slug: 'emergency-fund',
     title: 'Emergency fund',
-    blurb: 'How much cash to keep for a job loss or a medical bill, and how long it takes to build.',
+    blurb: 'Enter your monthly spending to see how much cash to keep and how long it takes to build.',
     fields: [
       { id: 'expenses', label: 'Essential spending a month', unit: 'money', value: 2500, min: 1, max: 1000000, step: 100, presets: [1500, 2500, 4000, 6000] },
-      { id: 'months', label: 'Months to cover', unit: 'plain', value: 6, min: 1, max: 36, step: 1, hint: '3 to 6 months is usual. Lean towards 6 or more if your income is uneven or others depend on you.', presets: [3, 6, 9, 12] },
+      { id: 'months', label: 'Months to cover', unit: 'plain', value: 6, min: 1, max: 36, step: 1, hint: '3 to 6 months is usual. Choose 6 or more if your income is uneven or others depend on you.', presets: [3, 6, 9, 12] },
       { id: 'saved', label: 'Set aside so far', unit: 'money', value: 2000, min: 0, max: 10000000, step: 100, presets: [0, 2000, 5000, 10000] },
       { id: 'monthly', label: 'Added each month', unit: 'money', value: 500, min: 0, max: 1000000, step: 50, presets: [200, 500, 1000, 2000] },
     ],
@@ -377,14 +445,21 @@ export const calculators: Calculator[] = [
       };
     },
     explain: [
-      'An emergency fund is cash kept apart from your investments, so that a job loss or a large bill does not force you to sell shares at a bad time. Count only spending you could not stop: housing, bills, food, transport, insurance.',
-      'Keep it where you can reach it within days and where it cannot fall in value: a savings account, a money market fund or Singapore Savings Bonds, which can be redeemed in any month. Interest is left out here because the point of this money is safety, not growth.',
+      {
+        title: 'How this is worked out',
+        points: [
+          ['What it is for.', 'Cash kept apart from investments, so a job loss or a large bill does not force you to sell shares at a low price.'],
+          ['What to count.', 'Only spending you could not stop: housing, bills, food, transport, insurance.'],
+          ['Where to keep it.', 'Somewhere you can reach within days and that cannot fall in value: a savings account, a money market fund or Singapore Savings Bonds. Savings Bonds can be redeemed in any month.'],
+          ['Interest is left out.', 'This money is for safety, not growth.'],
+        ],
+      },
     ],
   },
   {
     slug: 'insurance-cover',
     title: 'Insurance cover',
-    blurb: 'Rough starting figures for life, disability and critical illness cover, and what MediSave pays towards a hospital plan.',
+    blurb: 'Enter your age, pay and spending to get starting figures for cover and what MediSave pays.',
     fields: [
       { id: 'age', label: 'Your age', unit: 'years', value: 30, min: 18, max: 99, step: 1, presets: ages([25, 30, 35, 40, 50]) },
       { id: 'pay', label: 'Take-home pay a year', unit: 'money', value: 60000, min: 1, max: 10000000, step: 1000, presets: [36000, 60000, 84000, 120000] },
@@ -401,15 +476,39 @@ export const calculators: Calculator[] = [
       legend: [],
     }),
     explain: [
-      'These are common rules of thumb, not advice: death and total permanent disability cover of about 10 times yearly spending, early critical illness cover of about 3 years of pay, and total premiums of no more than about 10% of take-home pay. Someone with no dependants and no debts may need far less; a sole breadwinner with a home loan may need more.',
-      'Hospital cover comes first. Every Singaporean and permanent resident has MediShield Life, sized for B2 and C wards in public hospitals. An Integrated Shield Plan adds private cover for higher wards. The MediShield Life part is paid fully from MediSave; the private part can be paid from MediSave up to 300 a year if you are 40 or under on your next birthday, 600 from 41 to 70 and 900 from 71, and the rest is paid in cash. Riders are paid in cash.',
-      'Term insurance gives cover for a set period at a low price. Whole life plans combine cover with savings and cost several times more for the same cover. The Ministry of Health publishes a comparison of Integrated Shield Plans, and compareFIRST (comparefirst.sg) lists life insurance prices across insurers. MediSave figures are from the Ministry of Health page last updated 30 April 2026.',
+      {
+        title: 'How this is worked out',
+        points: [
+          ['Death and total permanent disability.', 'About 10 times yearly spending.'],
+          ['Early critical illness.', 'About 3 years of pay.'],
+          ['Premiums.', 'No more than about 10% of take-home pay in total.'],
+          ['Rules of thumb, not advice.', 'With no dependants and no debts you may need far less. A sole breadwinner with a home loan may need more.'],
+        ],
+      },
+      {
+        title: 'Hospital cover comes first',
+        points: [
+          ['MediShield Life.', 'Every Singaporean and permanent resident has it. It is sized for B2 and C wards in public hospitals and is paid fully from MediSave.'],
+          ['Integrated Shield Plan.', 'Adds private cover for higher wards.'],
+          ['MediSave for the private part.', 'Up to 300 a year if you are 40 or under on your next birthday, 600 from 41 to 70, and 900 from 71. The rest is paid in cash.'],
+          ['Riders.', 'Paid in cash.'],
+          ['Source.', 'MediSave figures are from the Ministry of Health page last updated 30 April 2026.'],
+        ],
+      },
+      {
+        title: 'Choosing a plan',
+        points: [
+          ['Term insurance.', 'Cover for a set period at a low price.'],
+          ['Whole life.', 'Combines cover with savings and costs several times more for the same cover.'],
+          ['Compare prices.', 'The Ministry of Health publishes a comparison of Integrated Shield Plans. compareFIRST (comparefirst.sg) lists life insurance prices across insurers.'],
+        ],
+      },
     ],
   },
   {
     slug: 'time-to-target',
     title: 'Time to a target',
-    blurb: 'How many years of monthly investing it takes to reach a sum such as 1 million.',
+    blurb: 'Enter a monthly amount and a target to see how many years it takes.',
     fields: [
       { id: 'start', label: 'Invested so far', unit: 'money', value: 10000, min: 0, max: 100000000, step: 1000, presets: [0, 10000, 50000, 100000] },
       { id: 'monthly', label: 'Invested each month', unit: 'money', value: 500, min: 0, max: 1000000, step: 50, presets: [250, 500, 1000, 2000, 5000] },
@@ -436,14 +535,21 @@ export const calculators: Calculator[] = [
       };
     },
     explain: [
-      'The balance grows by one twelfth of the yearly return each month, then the monthly amount is added. Doubling what you invest does not halve the time, because growth does more of the work the longer the money is invested.',
-      'In the early years the amount you save matters far more than the return you earn: a 10% return on 1,000 is 100, while saving another 400 a month adds 4,800 a year. Use a cautious return such as 5.5% to 6% for a world share fund; past returns do not promise future ones.',
+      {
+        title: 'How this is worked out',
+        points: [
+          ['How it grows.', 'Each month the balance grows by one twelfth of the yearly return. Then the monthly amount is added.'],
+          ['Doubling the amount does not halve the time.', 'Growth adds more the longer the money is invested.'],
+          ['Early on, saving matters more than return.', 'A 10% return on 1,000 is 100. Saving another 400 a month adds 4,800 a year.'],
+          ['Use a cautious return.', '5.5% to 6% for a world share fund. Past returns do not promise future ones.'],
+        ],
+      },
     ],
   },
   {
     slug: 'allocation',
     title: 'Stocks and bonds split',
-    blurb: 'Set a stocks-to-bonds split from your age, counting CPF as the bond part.',
+    blurb: 'Enter your age and balances to get a stocks and bonds split, with CPF counted as bonds.',
     fields: [
       { id: 'age', label: 'Your age', unit: 'years', value: 35, min: 18, max: 99, step: 1, presets: ages([25, 30, 35, 45, 60]) },
       { id: 'rule', label: 'Rule number', unit: 'plain', value: 110, min: 50, max: 150, step: 5, hint: 'Your stocks share is this number minus your age. 100 is cautious, 120 is aggressive.', presets: [100, 110, 120] },
@@ -471,17 +577,25 @@ export const calculators: Calculator[] = [
       };
     },
     explain: [
-      'A common starting rule is to hold a share in stocks equal to 110 minus your age, and the rest in bonds: 80% stocks at 30, 65% at 45, 50% at 60. The idea is to take more risk while retirement is far away and less as it gets close. Your own comfort with large falls matters more than the rule.',
-      'CPF Ordinary and Special Account balances behave like a government bond: the value does not fall and the interest is set. Counting them as the bond part often means the money you invest yourself can all be in stocks. The catch is that CPF cannot be reached before 55, so if you need safe money sooner, hold some bonds, Savings Bonds or T-bills outside CPF as well.',
+      {
+        title: 'How this is worked out',
+        points: [
+          ['The starting rule.', 'Your stocks share is 110 minus your age; the rest is bonds. That is 80% stocks at 30, 65% at 45 and 50% at 60.'],
+          ['Why it falls with age.', 'You take more risk while retirement is far away and less as it gets close. Your own comfort with large falls matters more than the rule.'],
+          ['CPF acts like a government bond.', 'Ordinary and Special Account balances do not fall in value and the interest is set.'],
+          ['What that means.', 'With CPF counted as the bond part, the money you invest yourself can often all be in stocks.'],
+          ['CPF is locked until 55.', 'If you need safe money sooner, also hold bonds, Savings Bonds or T-bills outside CPF.'],
+        ],
+      },
     ],
   },
   {
     slug: 'fx-cost',
     title: 'Currency conversion cost',
-    blurb: 'What a broker’s exchange-rate spread costs each time you convert, and over years of investing.',
+    blurb: 'Enter your broker’s spread to see what currency conversion costs, per trade and over years.',
     fields: [
       { id: 'amount', label: 'Amount converted each time', unit: 'money', value: 1000, min: 1, max: 100000000, step: 100, presets: [500, 1000, 5000, 10000, 50000] },
-      { id: 'spread', label: 'Spread, one way', unit: 'percent', value: 0.5, min: 0, max: 5, step: 0.01, hint: 'How far the rate you get is from the mid-market rate. Compare your broker’s quote with the rate shown by a search engine.', presets: [0.03, 0.2, 0.5, 1] },
+      { id: 'spread', label: 'Spread, one way', unit: 'percent', value: 0.5, min: 0, max: 5, step: 0.01, hint: 'How far your rate is from the mid-market rate. Compare your broker’s quote with the rate a search engine shows.', presets: [0.03, 0.2, 0.5, 1] },
       { id: 'fee', label: 'Fixed fee each time', unit: 'money', value: 0, min: 0, max: 1000, step: 0.5, presets: [0, 2, 5] },
       { id: 'times', label: 'Conversions', unit: 'count', value: 12, min: 1, max: 365, step: 1, presets: [{ label: 'Monthly', value: 12 }, { label: 'Quarterly', value: 4 }, { label: 'Yearly', value: 1 }] },
       { id: 'years', label: 'Over how long', unit: 'years', value: 20, min: 1, max: 60, step: 1, presets: [5, 10, 20, 30] },
@@ -501,17 +615,25 @@ export const calculators: Calculator[] = [
       };
     },
     explain: [
-      'Buying a fund priced in US dollars means converting Singapore dollars first. Brokers and robo-advisers rarely charge a visible fee for this; they give you a rate slightly worse than the market rate and keep the difference. A 0.5% spread is paid again when you convert back, so the round trip costs 1%.',
-      'To find your spread, compare the rate your platform quotes with the mid-market rate at the same moment. Spreads differ widely between platforms, from a few hundredths of a percent to half a percent or more. This is a cost on top of the fund’s expense ratio and any commission.',
+      {
+        title: 'How this is worked out',
+        points: [
+          ['Where the cost is.', 'Brokers and robo-advisers rarely charge a visible fee. They give a rate slightly worse than the market rate and keep the difference.'],
+          ['You pay it twice.', 'A 0.5% spread is paid again when you convert back, so the round trip costs 1%.'],
+          ['Find your spread.', 'Compare the rate your platform quotes with the mid-market rate at the same moment.'],
+          ['Spreads differ widely.', 'From a few hundredths of a percent to half a percent or more, depending on the platform.'],
+          ['It is an extra cost.', 'It comes on top of the fund’s expense ratio and any commission.'],
+        ],
+      },
     ],
   },
   {
     slug: 'flat-rate-loan',
     title: 'Flat-rate loan and EIR',
-    blurb: 'Turn the flat rate advertised on a car or personal loan into the effective interest rate you really pay.',
+    blurb: 'Enter the flat rate from a car or personal loan advert to see the effective rate you pay.',
     fields: [
       { id: 'amount', label: 'Amount borrowed', unit: 'money', value: 20000, min: 100, max: 100000000, step: 500, presets: [5000, 10000, 20000, 50000, 100000] },
-      { id: 'rate', label: 'Advertised flat rate', unit: 'percent', value: 3.5, min: 0, max: 40, step: 0.01, hint: 'The headline yearly rate in the advertisement, charged on the full amount for the whole loan.', presets: [1.88, 2.78, 3.5, 5, 7] },
+      { id: 'rate', label: 'Advertised flat rate', unit: 'percent', value: 3.5, min: 0, max: 40, step: 0.01, hint: 'The yearly rate in the advertisement. It is charged on the full amount for the whole loan.', presets: [1.88, 2.78, 3.5, 5, 7] },
       { id: 'years', label: 'Loan length', unit: 'years', value: 5, min: 1, max: 10, step: 1, presets: [1, 3, 5, 7] },
       { id: 'fee', label: 'Fees taken upfront', unit: 'money', value: 0, min: 0, max: 100000, step: 50, hint: 'Processing fee deducted from the loan or paid at the start.', presets: [0, 100, 200, 500] },
     ],
@@ -530,8 +652,16 @@ export const calculators: Calculator[] = [
       };
     },
     explain: [
-      'A flat rate charges interest on the full amount you borrowed for every year of the loan, even though you owe less after each repayment. The interest is simply amount × rate × years, added to the loan and divided into equal monthly repayments.',
-      'Because you are paying interest on money you have already returned, the true cost is close to double the advertised figure. The effective interest rate (EIR) is that true cost: the yearly rate, compounded monthly and counting upfront fees, at which your repayments match the money you actually received. Lenders in Singapore must show the EIR next to the advertised rate. Compare loans by EIR, never by the flat rate.',
+      {
+        title: 'How this is worked out',
+        points: [
+          ['Compare loans by EIR.', 'Never by the flat rate. Lenders in Singapore must show the EIR next to the advertised rate.'],
+          ['What a flat rate does.', 'It charges interest on the full amount borrowed for every year of the loan, even though you owe less after each repayment.'],
+          ['The interest.', 'Amount × rate × years. It is added to the loan and divided into equal monthly repayments.'],
+          ['Why the true cost is higher.', 'You pay interest on money you have already returned. The true cost is close to double the advertised figure.'],
+          ['What EIR means.', 'The yearly rate, compounded monthly and counting upfront fees, at which your repayments match the money you received.'],
+        ],
+      },
     ],
   },
 ];

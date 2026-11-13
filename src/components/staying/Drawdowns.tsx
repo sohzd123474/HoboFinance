@@ -37,7 +37,7 @@ export default function Drawdowns() {
               </select>
             </div>
             <div>
-              <span className="ctl-label">Count a year as scary when it fell at least</span>
+              <span className="ctl-label">Count a year when it fell at least</span>
               <Presets label="Fall" options={[5, 10, 15, 20, 30].map((v) => ({ label: `${v}%`, value: v }))} current={o.threshold} onPick={(v) => setO((p) => ({ ...p, threshold: v }))} />
             </div>
           </div>
@@ -78,11 +78,16 @@ export default function Drawdowns() {
             </tbody>
           </table>
         </div>
-        <p className="note">
-          A fall is measured from a high to a later low inside the same calendar year, using daily closing prices with
-          dividends included. Selling during a fall turns it into a loss; in many of these years the price had recovered
-          by December.
-        </p>
+        <ul className="points">
+          <li>
+            <strong>Selling makes the loss real.</strong> Selling during a fall turns it into a loss. In many of these
+            years the price had recovered by December.
+          </li>
+          <li>
+            <strong>How a fall is measured.</strong> From a high to a later low inside the same calendar year. It uses
+            daily closing prices with dividends included.
+          </li>
+        </ul>
       </section>
 
       <section>

@@ -10,8 +10,8 @@ import Explorer from '../../components/snp1/Explorer.tsx';
   <div class="wrap page-head">
     <h1>SNP1 strategy</h1>
     <p class="lede">
-      Hold the single largest US company by market value. Check the ranking on the 1st of each month, switch only if #1
-      has changed, and add new money monthly.
+      See this month’s #1 and backtest the rule against SPY. The rule: hold only the largest US company by market value,
+      check the ranking on the 1st of each month, and switch only if #1 has changed.
     </p>
   </div>
 
@@ -23,17 +23,37 @@ import Explorer from '../../components/snp1/Explorer.tsx';
     <section class="context">
       <h2>How to read this</h2>
       <div class="panel">
-        <p>
-          <strong>This is a concentrated bet that works in some decades and fails in others.</strong> Michael Mauboussin
-          and Dan Callahan at Counterpoint Global studied US stocks from 1950 to 2023 using CRSP data. They report that
-          owning the largest stock trailed the S&amp;P 500 by about 4.3 percentage points a year over the full period,
-          but beat it by about 14 points a year from 2014 to 2023. The years 2000 to 2013 were poor: the largest
-          companies then were Microsoft, General Electric and Cisco.
-        </p>
-        <p>
-          The largest company is usually there because its price has risen a lot. Holding it is a bet that the rise
-          continues. Treat a good recent record as a feature of the period, not proof of the rule.
-        </p>
+        <ul class="points">
+          <li><strong>A concentrated bet.</strong> It works in some decades and fails in others.</li>
+          <li>
+            <strong>Why a company is #1.</strong> Usually because its price has risen. Holding it is a bet that the rise
+            continues.
+          </li>
+          <li>
+            <strong>A good recent record.</strong> Treat it as a feature of the period, not proof of the rule.
+          </li>
+        </ul>
+      </div>
+
+      <h2>What a long study found</h2>
+      <div class="panel">
+        <ul class="points">
+          <li>
+            <strong>The study.</strong> Michael Mauboussin and Dan Callahan at Counterpoint Global studied US stocks from
+            1950 to 2023 using CRSP data.
+          </li>
+          <li>
+            <strong>Full period.</strong> They report that owning the largest stock trailed the S&amp;P 500 by about 4.3
+            percentage points a year.
+          </li>
+          <li>
+            <strong>2014 to 2023.</strong> They report that it beat the S&amp;P 500 by about 14 points a year.
+          </li>
+          <li>
+            <strong>2000 to 2013.</strong> These years were poor. The largest companies then were Microsoft, General
+            Electric and Cisco.
+          </li>
+        </ul>
         <p class="note">
           Figures in this box are as reported in “Stock Market Concentration” (Counterpoint Global, Morgan Stanley
           Investment Management, 2024). They are not recomputed here.
@@ -42,12 +62,20 @@ import Explorer from '../../components/snp1/Explorer.tsx';
 
       <h2>Survivorship bias</h2>
       <div class="panel">
-        <p>
-          The ranking table was researched after the fact, from sources that are easier to find for companies that are
-          still large today. Prices come from a source that drops delisted companies. Both make the past look tidier
-          than it was to live through. No company that reached #1 since 2000 has been delisted, so the SNP1 line is less
-          affected than the top-7 variants, where rows marked unsure matter more.
-        </p>
+        <ul class="points">
+          <li>
+            <strong>Researched after the fact.</strong> The ranking table uses sources that are easier to find for
+            companies that are still large today.
+          </li>
+          <li><strong>Delisted companies are missing.</strong> Prices come from a source that drops them.</li>
+          <li>
+            <strong>The effect.</strong> Both make the past look more orderly than it was at the time.
+          </li>
+          <li>
+            <strong>SNP1 is less affected.</strong> No company that reached #1 since 2000 has been delisted. The top-7
+            variants are affected more, and rows marked unsure matter more there.
+          </li>
+        </ul>
       </div>
     </section>
   </div>

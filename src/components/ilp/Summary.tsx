@@ -113,12 +113,24 @@ export default function Summary() {
         </div>
       </div>
 
-      <p className="warn">
-        The ILP is a regular-premium investment-linked policy with charges like those of AIA Pro Achiever 3.0.{' '}
-        {unverified} of the {ILP_DEFAULT_NOTES.length} starting figures could not be confirmed against the insurer’s own
-        documents; rows tagged unverified still use one. Insurance cover, its cost, and surrender or other early-exit
-        charges are not modelled, and every premium is assumed to be paid on time.
-      </p>
+      <div className="warn">
+        <ul>
+          <li>
+            <strong>The ILP modelled.</strong> A regular-premium investment-linked policy with charges like those of AIA
+            Pro Achiever 3.0.
+          </li>
+          <li>
+            <strong>
+              {unverified} of the {ILP_DEFAULT_NOTES.length} starting figures are unconfirmed.
+            </strong>{' '}
+            They could not be checked against the insurer’s own documents. Rows tagged unverified still use one.
+          </li>
+          <li>
+            <strong>Not modelled.</strong> Insurance cover, its cost, and surrender or other early-exit charges. Every
+            premium is assumed to be paid on time.
+          </li>
+        </ul>
+      </div>
 
       {!nothingPaid && (
         <>
@@ -179,7 +191,7 @@ export default function Summary() {
                   <td>{pct(o.grossReturnPct / 100, 2)}</td>
                 </tr>
                 <tr>
-                  <td className="wrap-cell">Return you actually get a year</td>
+                  <td className="wrap-cell">Return you get a year</td>
                   <td>{r.ilp.irr === null ? 'n/a: the account ends at zero' : pct(r.ilp.irr, 2)}</td>
                   <td>{r.diy.irr === null ? 'n/a: the account ends at zero' : pct(r.diy.irr, 2)}</td>
                 </tr>

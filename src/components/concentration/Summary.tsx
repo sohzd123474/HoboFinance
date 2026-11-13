@@ -126,10 +126,20 @@ export default function Summary() {
 
       {unread('your holdings', held.errors)}
       {unread('your monthly plan', dca.errors)}
-      <p className="warn">
-        Index weights drift every trading day. Prices are held still for the {DCA_MONTHS} months, so only purchases change
-        the shares. A world fund’s US part is assumed to be weighted like the S&amp;P 500.
-      </p>
+      <div className="warn">
+        <ul>
+          <li>
+            <strong>Weights change.</strong> Index weights change every trading day.
+          </li>
+          <li>
+            <strong>Prices assumed unchanged.</strong> Prices are assumed not to change for the {DCA_MONTHS} months, so
+            only purchases change the shares.
+          </li>
+          <li>
+            <strong>World funds.</strong> A world fund’s US part is assumed to be weighted like the S&amp;P 500.
+          </li>
+        </ul>
+      </div>
 
       {!empty && (
         <>

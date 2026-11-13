@@ -11,8 +11,8 @@ import { CPF_AS_OF } from '../../data/cpf';
   <div class="wrap page-head">
     <h1>FIRE and CPF bridge planner</h1>
     <p class="lede">
-      Work out whether your liquid portfolio can pay your spending from the day you stop work until 55, when CPF savings
-      above the retirement sum can be withdrawn.
+      Enter your savings and spending to find the earliest age you can stop work. Your liquid portfolio must pay your
+      spending until 55, when CPF savings above the retirement sum can be withdrawn.
     </p>
   </div>
 
@@ -24,11 +24,14 @@ import { CPF_AS_OF } from '../../data/cpf';
     <section class="context">
       <h2>What this leaves out</h2>
       <div class="panel">
-        <p>
-          <strong>This is a simplified model, not advice.</strong> CPF rules change most years. The rates here were read
-          from cpf.gov.sg on {CPF_AS_OF}; check <a href="https://www.cpf.gov.sg/">cpf.gov.sg</a> before acting, and
-          correct any figure that has moved in the Assumptions section.
-        </p>
+        <ul class="points">
+          <li><strong>Simplified model, not advice.</strong> CPF rules change most years.</li>
+          <li>
+            <strong>Check before acting.</strong> The rates here were read from cpf.gov.sg on {CPF_AS_OF}. Check
+            <a href="https://www.cpf.gov.sg/">cpf.gov.sg</a> for changes.
+          </li>
+          <li><strong>Correct old figures.</strong> Change any figure that has moved in the Assumptions section.</li>
+        </ul>
         <div class="table-scroll">
           <table class="data">
             <thead>
@@ -40,7 +43,7 @@ import { CPF_AS_OF } from '../../data/cpf';
             <tbody>
               <tr>
                 <td class="wrap-cell">Returns are the same every month</td>
-                <td class="wrap-cell">Real markets fall, sometimes just after you stop work. Try the 5% return as a caution.</td>
+                <td class="wrap-cell">Real markets fall, sometimes just after you stop work. Try the 5% return as a cautious case.</td>
               </tr>
               <tr>
                 <td class="wrap-cell">Salary, investing and spending rise exactly with inflation</td>
@@ -52,15 +55,15 @@ import { CPF_AS_OF } from '../../data/cpf';
               </tr>
               <tr>
                 <td class="wrap-cell">CPF interest is added monthly</td>
-                <td class="wrap-cell">CPF works interest out monthly but credits it once a year, so real balances grow very slightly slower.</td>
+                <td class="wrap-cell">CPF works interest out monthly but credits it once a year, so real balances grow slightly slower.</td>
               </tr>
               <tr>
                 <td class="wrap-cell">Everything withdrawable at 55 is withdrawn</td>
-                <td class="wrap-cell">CPFIS investments are sold into OA at 55 and savings above the retirement sum move to the liquid portfolio. In practice you can leave them in CPF.</td>
+                <td class="wrap-cell">CPFIS investments are sold into OA at 55 and savings above the retirement sum move to the liquid portfolio. You can choose to leave them in CPF instead.</td>
               </tr>
               <tr>
                 <td class="wrap-cell">No CPF LIFE payouts</td>
-                <td class="wrap-cell">The Retirement Account keeps earning interest and is only drawn on, from the payout age, once the liquid portfolio is empty.</td>
+                <td class="wrap-cell">The Retirement Account keeps earning interest. It pays spending only from the payout age, and only once the liquid portfolio is empty.</td>
               </tr>
               <tr>
                 <td class="wrap-cell">MediSave is never spent</td>

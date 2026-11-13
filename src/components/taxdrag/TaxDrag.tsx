@@ -150,12 +150,24 @@ export default function TaxDrag() {
               <Presets label="Buy orders a year" options={[1, 4, 12]} current={o.orders} onPick={(v) => set('orders', v)} />
             </div>
           </div>
-          <p className="note">
-            The return and dividend yield apply to both funds, so the comparison is fair only when both track a similar
-            index. The starting yield of {pct(DEFAULT_A.dividendYield, 2)} is the {DEFAULT_A.yieldNote}. Extra commission
-            is what an order on the London Stock Exchange costs you above an order for a US-listed fund; look it up at
-            your broker. It is charged to Ireland-domiciled funds only, and only in years when you add money.
-          </p>
+          <ul className="points">
+            <li>
+              <strong>Same return for both.</strong> The return and dividend yield apply to both funds. The comparison
+              is fair only when both track a similar index.
+            </li>
+            <li>
+              <strong>Starting yield.</strong> The starting yield of {pct(DEFAULT_A.dividendYield, 2)} is the{' '}
+              {DEFAULT_A.yieldNote}.
+            </li>
+            <li>
+              <strong>Extra commission.</strong> What a London Stock Exchange order costs you above an order for a
+              US-listed fund. Look it up at your broker.
+            </li>
+            <li>
+              <strong>When it is charged.</strong> To Ireland-domiciled funds only, and only in years when you add
+              money.
+            </li>
+          </ul>
         </div>
         {fundControls('A')}
         {fundControls('B')}
@@ -196,10 +208,17 @@ export default function TaxDrag() {
             </tbody>
           </table>
         </div>
-        <p className="note">
-          Total drag is the expense ratio plus dividend yield × withholding rate. Dividend tax is the part of the yield
-          lost to withholding. Extra commission is commission per order × buy orders a year.
-        </p>
+        <ul className="points">
+          <li>
+            <strong>Total drag.</strong> Expense ratio plus dividend yield × withholding rate.
+          </li>
+          <li>
+            <strong>Dividend tax.</strong> The part of the yield lost to withholding.
+          </li>
+          <li>
+            <strong>Extra commission.</strong> Commission per order × buy orders a year.
+          </li>
+        </ul>
       </section>
 
       <section>
@@ -239,16 +258,18 @@ export default function TaxDrag() {
         <div className="panel">
           {!irish || !breakEven ? (
             <p>
-              <strong>n/a:</strong> the break-even applies only when one fund is US-domiciled and the other is
-              Ireland-domiciled. {nameA} and {nameB} are both {a.etf.domicile === 'IE' ? 'Ireland' : 'US'}-domiciled.
+              <strong>n/a:</strong> {nameA} and {nameB} are both {a.etf.domicile === 'IE' ? 'Ireland' : 'US'}-domiciled.
+              Pick one US-domiciled fund and one Ireland-domiciled fund to see a break-even.
             </p>
           ) : breakEven.ok ? (
             <>
               <p className="stat">{sgd(breakEven.size)}</p>
               <p>
-                Above this size, {irish.etf.ticker}’s lower drag ({pct(irish.drag, 3)} against {pct(other.drag, 3)} for{' '}
-                {other.etf.ticker}) saves more each year than the {sgd(calc.perYear)} of extra commission.
-                {calc.perYear === 0 && ' With no extra commission it is ahead at any size.'}
+                {calc.perYear === 0
+                  ? `With no extra commission, ${irish.etf.ticker} costs less each year than ${other.etf.ticker} at any size.`
+                  : `Above this size, ${irish.etf.ticker} costs less each year than ${other.etf.ticker}.`}{' '}
+                Its lower drag ({pct(irish.drag, 3)} against {pct(other.drag, 3)}) saves more than the{' '}
+                {sgd(calc.perYear)} of extra commission.
               </p>
             </>
           ) : (
@@ -313,11 +334,21 @@ export default function TaxDrag() {
             </tbody>
           </table>
         </div>
-        <p className="note">
-          Each year’s new money goes in at the start of the year, less any extra commission, and the balance then grows
-          at the return before costs minus the fund’s drag. Currency conversion, the broker’s standard commission and
-          bid-ask spreads are not included. Difference is {nameB} minus {nameA}.
-        </p>
+        <ul className="points">
+          <li>
+            <strong>New money.</strong> Each year’s new money goes in at the start of the year, less any extra
+            commission.
+          </li>
+          <li>
+            <strong>Growth.</strong> The balance then grows at the return before costs minus the fund’s drag.
+          </li>
+          <li>
+            <strong>Not included.</strong> Currency conversion, the broker’s standard commission and bid-ask spreads.
+          </li>
+          <li>
+            <strong>Difference.</strong> {nameB} minus {nameA}.
+          </li>
+        </ul>
       </section>
 
       <section>
@@ -358,12 +389,22 @@ export default function TaxDrag() {
             </tbody>
           </table>
         </div>
-        <p className="note">
-          Researched on {day(RESEARCHED_ON)}. Each ticker links to the issuer’s page. For funds that hold shares outside
-          the US (VWRA, IWDA, EIMI), the withholding shown is 15% × the US share of the fund, because only US dividends
-          pass through the US–Ireland treaty rate. Other countries withhold their own tax before dividends reach either
-          kind of fund; that is not counted here. Change the rate above if you have a better estimate.
-        </p>
+        <ul className="points">
+          <li>
+            <strong>Researched on {day(RESEARCHED_ON)}.</strong> Each ticker links to the issuer’s page.
+          </li>
+          <li>
+            <strong>Funds with non-US shares.</strong> For VWRA, IWDA and EIMI, the withholding shown is 15% × the US
+            share of the fund. Only US dividends get the US–Ireland treaty rate.
+          </li>
+          <li>
+            <strong>Other countries’ tax.</strong> Other countries withhold their own tax before dividends reach either
+            kind of fund. That tax is not counted here.
+          </li>
+          <li>
+            <strong>Better estimate.</strong> If you have one, change the withholding rate above.
+          </li>
+        </ul>
       </section>
 
       <section>
@@ -389,12 +430,21 @@ export default function TaxDrag() {
               </tbody>
             </table>
           </div>
-          <p>
-            If you are not a US citizen or resident and you die holding more than US${whole(ESTATE_TAX.exemptionUsd)} in
-            US-situs assets, your estate faces US estate tax of up to {pct(ESTATE_TAX.topRate, 0)} on the excess. Shares
-            in US-domiciled funds such as SPY, VOO and QQQ are US-situs. Ireland-domiciled UCITS funds are generally not
-            US-situs, even when they hold US shares.
-          </p>
+          <ul className="points">
+            <li>
+              <strong>The tax.</strong> Your estate can owe US estate tax of up to {pct(ESTATE_TAX.topRate, 0)} on
+              US-situs assets above US${whole(ESTATE_TAX.exemptionUsd)}. It applies if you die while not a US citizen or
+              resident.
+            </li>
+            <li>
+              <strong>US-domiciled funds count.</strong> Shares in US-domiciled funds such as SPY, VOO and QQQ are
+              US-situs.
+            </li>
+            <li>
+              <strong>Irish funds generally do not.</strong> Ireland-domiciled UCITS funds are generally not US-situs,
+              even when they hold US shares.
+            </li>
+          </ul>
           <p>
             <strong>Confirm with a tax professional.</strong>
           </p>
@@ -489,18 +539,29 @@ function CspxSpyl() {
           </tbody>
         </table>
       </div>
-      <p>
-        {cheapest?.etf && sized.length === 2 && ratio !== null
-          ? `${cheapest.c.ticker} has the lower fee, but it is the newer and smaller fund: ${sized[0].c.ticker} is about ${ratio.toFixed(1)} times its size. `
-          : 'The lower-fee fund is the newer and smaller one. '}
-        A smaller, newer fund can have a wider bid-ask spread, which you pay each time you buy or sell. No like-for-like
-        spread figures were found for the two London listings, so compare the live bid and offer at your broker before
-        choosing.
-      </p>
-      <p className="note">
-        Fund sizes are both from justETF in euros so they are like for like; justETF does not date the figure, so the
-        date shown is the day it was read. To test the fee difference, pick CSPX and SPYL as the two funds above.
-      </p>
+      <ul className="points">
+        <li>
+          <strong>Lower fee, smaller fund.</strong>{' '}
+          {cheapest?.etf && sized.length === 2 && ratio !== null
+            ? `${cheapest.c.ticker} has the lower fee. It is the newer and smaller fund: ${sized[0].c.ticker} is about ${ratio.toFixed(1)} times its size.`
+            : 'The lower-fee fund is the newer and smaller one.'}
+        </li>
+        <li>
+          <strong>Spread can be wider.</strong> A smaller, newer fund can have a wider bid-ask spread. You pay the
+          spread each time you buy or sell.
+        </li>
+        <li>
+          <strong>Check the live spread.</strong> No comparable spread figures were found for the two London listings.
+          Compare the live bid and offer at your broker before choosing.
+        </li>
+        <li>
+          <strong>Fund sizes.</strong> Both are from justETF in euros, so they are comparable. justETF does not date
+          the figure, so the date shown is the day it was read.
+        </li>
+        <li>
+          <strong>Test the fee difference.</strong> Pick CSPX and SPYL as the two funds above.
+        </li>
+      </ul>
     </>
   );
 }

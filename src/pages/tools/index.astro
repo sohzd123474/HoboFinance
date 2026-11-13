@@ -2,13 +2,35 @@
 import Base from '../../layouts/Base.astro';
 import LinkList from '../../components/LinkList.astro';
 import { tools } from '../../lib/tools';
+import { stages } from '../../lib/stages';
+
+const blurb = (href: string) => tools.find((t) => `/tools/${t.slug}/` === href)?.blurb ?? '';
+const groups = stages
+  .map((s) => ({ title: s.title, items: s.steps.filter((x) => x.href.startsWith('/tools/')).map((x) => ({ href: x.href, title: x.title, blurb: blurb(x.href) })) }))
+  .filter((g) => g.items.length > 0);
 ---
 
 <Base title="Tools" description="Investing tools for people in Singapore: strategy backtests, ETF tax drag, CPF and FIRE planning.">
   <div class="wrap page-head">
     <h1>Tools</h1>
-    <p class="lede">Investing tools built for people in Singapore. Your inputs stay in your browser.</p>
-    <LinkList items={tools.filter((t) => t.ready).map((t) => ({ href: `/tools/${t.slug}/`, title: t.title, blurb: t.blurb }))} />
+    <p class="lede">Pick a tool. They are grouped by what you are trying to do. Your inputs stay in your browser.</p>
+    {
+      groups.map((g) => (
+        <section class="group">
+          <h2>{g.title}</h2>
+          <LinkList items={g.items} />
+        </section>
+      ))
+    }
     {!tools.some((t) => t.ready) && <p style="margin-top:2rem">The first tools are being built. Try the <a href="/calculators/">basic calculators</a> in the meantime.</p>}
   </div>
 </Base>
+
+<style>
+  .group {
+    margin-top: 2rem;
+  }
+  .group h2 {
+    font-size: var(--step-1);
+  }
+</style>

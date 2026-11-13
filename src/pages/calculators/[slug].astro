@@ -107,10 +107,20 @@ const chipLabel = (n: number, unit: string) =>
   </div>
 
   <section class="wrap">
-    <h2>How this is worked out</h2>
-    <div class="prose">
-      {calc.explain.map((p) => <p>{p}</p>)}
-    </div>
+    {
+      calc.explain.map((g, i) => (
+        <div class="explain">
+          {i === 0 ? <h2>{g.title}</h2> : <h3>{g.title}</h3>}
+          <ul class="points">
+            {g.points.map(([lead, text]) => (
+              <li>
+                <strong>{lead}</strong> {text}
+              </li>
+            ))}
+          </ul>
+        </div>
+      ))
+    }
   </section>
 </Base>
 

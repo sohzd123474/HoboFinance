@@ -68,7 +68,7 @@ export default function Summary() {
                 <td>{plain(oaRate)} a year</td>
               </tr>
               <tr>
-                <td className="wrap-cell">Rate earned on reinvested interest</td>
+                <td className="wrap-cell">Reinvestment rate</td>
                 <td>
                   {plain(reinvestRate)} a year{o.reinvestRate === null ? ' (same as OA)' : ''}
                 </td>

@@ -85,11 +85,21 @@ export default function Concentration() {
               <textarea id="con-dca" rows={8} spellCheck={false} value={o.dcaText} onChange={(e) => set('dcaText', e.target.value)} />
             </div>
           </div>
-          <p className="note">
-            Use one currency for every value. Commas, tabs, currency symbols and thousands separators are fine, for
-            example <code>AAPL, S$5,000</code>. A ticker that appears twice is added together. The starting example is
-            made up.
-          </p>
+          <ul className="points">
+            <li>
+              <strong>One currency.</strong> Use the same currency for every value.
+            </li>
+            <li>
+              <strong>Format.</strong> Commas, tabs, currency symbols and thousands separators are accepted, for example{' '}
+              <code>AAPL, S$5,000</code>.
+            </li>
+            <li>
+              <strong>Repeated tickers.</strong> A ticker that appears twice is added together.
+            </li>
+            <li>
+              <strong>Example data.</strong> The starting example is made up.
+            </li>
+          </ul>
           <button type="button" className="btn" onClick={() => setO(DEFAULTS)}>
             Reset to the example
           </button>
@@ -162,12 +172,20 @@ export default function Concentration() {
               )}
             </>
           )}
-          <p className="note">
-            Pre-ticked as S&amp;P 500 funds: {SP500_FUNDS.join(', ')}. Pre-ticked as world funds:{' '}
-            {WORLD_FUNDS.map((f) => f.ticker).join(', ')}. A fund is spread across the companies in the S&amp;P 500 list
-            below by weight. For a world fund only its US share is spread this way, which assumes its US part is
-            weighted like the S&amp;P 500.
-          </p>
+          <ul className="points">
+            <li>
+              <strong>Pre-ticked funds.</strong> S&amp;P 500 funds: {SP500_FUNDS.join(', ')}. World funds:{' '}
+              {WORLD_FUNDS.map((f) => f.ticker).join(', ')}.
+            </li>
+            <li>
+              <strong>How a fund is split.</strong> A fund is spread across the companies in the S&amp;P 500 list below,
+              by weight.
+            </li>
+            <li>
+              <strong>World funds.</strong> Only the US share is spread this way. This assumes the US part is weighted
+              like the S&amp;P 500.
+            </li>
+          </ul>
         </div>
       </section>
 
@@ -236,7 +254,7 @@ export default function Concentration() {
                 </tbody>
               </table>
             </div>
-            <p className="note">Here each fund counts as one position. Prices are held still for the {DCA_MONTHS} months, so only your purchases change the shares.</p>
+            <p className="note">Each fund counts as one position here. Prices are assumed not to change for the {DCA_MONTHS} months, so only your purchases change the shares.</p>
           </section>
 
           <section>
@@ -338,14 +356,24 @@ export default function Concentration() {
                 </tbody>
               </table>
             </div>
-            <p className="note">
-              The Herfindahl index is the sum of each holding’s share squared: 1 means everything is in one holding, and
-              a lower number means more spread. The effective number of holdings is 1 divided by the index. The verdict
-              uses the look-through figures and says “barely changes” when the index moves by less than{' '}
-              {pct(VERDICT_THRESHOLD, 0)} of its starting value. In the look-through figures, fund money outside the{' '}
-              {SP500_TOP.length} listed companies is spread over hundreds of small holdings and is counted as adding
-              nothing to the index, so the effective number is slightly overstated.
-            </p>
+            <ul className="points">
+              <li>
+                <strong>Herfindahl index.</strong> The sum of each holding’s share squared. 1 means everything is in one
+                holding, and a lower number means more spread.
+              </li>
+              <li>
+                <strong>Effective number of holdings.</strong> 1 divided by the index.
+              </li>
+              <li>
+                <strong>The verdict.</strong> It uses the look-through figures. It says “barely changes” when the index
+                moves by less than {pct(VERDICT_THRESHOLD, 0)} of its starting value.
+              </li>
+              <li>
+                <strong>Slightly overstated.</strong> The look-through effective number is slightly too high. Fund money
+                outside the {SP500_TOP.length} listed companies is spread over hundreds of small holdings and is counted
+                as adding nothing to the index.
+              </li>
+            </ul>
           </section>
 
           <section>
@@ -387,18 +415,28 @@ export default function Concentration() {
 
       <section>
         <h2>The S&amp;P 500 weights used</h2>
-        <p className="note">
-          Weights are as of {dateLabel(SP500_TOP_AS_OF)} and drift every trading day. They are the largest holdings of
-          the SPDR S&amp;P 500 ETF (SPY), used as a stand-in for the index, and cover {listedWeight.toFixed(1)}% of it.
-          Alphabet’s two share classes (GOOGL and GOOG) are combined. Sources:{' '}
-          {SP500_TOP_SOURCES.map((s, i) => (
-            <span key={s.url}>
-              {i > 0 && ', '}
-              <a href={s.url}>{s.label}</a>
-            </span>
-          ))}
-          .
-        </p>
+        <ul className="points">
+          <li>
+            <strong>Date.</strong> Weights are as of {dateLabel(SP500_TOP_AS_OF)} and change every trading day.
+          </li>
+          <li>
+            <strong>Taken from SPY.</strong> They are the largest holdings of the SPDR S&amp;P 500 ETF (SPY), used in
+            place of the index. They cover {listedWeight.toFixed(1)}% of it.
+          </li>
+          <li>
+            <strong>Alphabet.</strong> Its two share classes (GOOGL and GOOG) are combined.
+          </li>
+          <li>
+            <strong>Sources.</strong>{' '}
+            {SP500_TOP_SOURCES.map((s, i) => (
+              <span key={s.url}>
+                {i > 0 && ', '}
+                <a href={s.url}>{s.label}</a>
+              </span>
+            ))}
+            .
+          </li>
+        </ul>
         <div className="table-scroll" style={{ maxHeight: '24rem', overflowY: 'auto' }}>
           <table className="data">
             <thead>

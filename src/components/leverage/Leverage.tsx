@@ -97,12 +97,19 @@ export default function Leverage() {
               <Presets label="Yearly cost" options={[{ label: '0%', value: 0 }, { label: '0.95%', value: 0.95 }, { label: '2%', value: 2 }, { label: '5%', value: 5 }]} current={o.cost} onPick={(v) => set('cost', v)} />
             </div>
           </div>
-          <p className="note">
-            Showing {index.dates[0]} to {index.dates[index.dates.length - 1]}. Dates outside the data ({firstIndex} to {lastDate}) fall back to
-            the nearest end. The yearly cost stands for the fund’s fees and borrowing costs; 0.95% is a starting value, so
-            check the fund’s own page for its current expense ratio. Borrowing costs rise with interest rates and are not
-            in that figure.
-          </p>
+          <ul className="points">
+            <li>
+              <strong>Period shown.</strong> {index.dates[0]} to {index.dates[index.dates.length - 1]}. A date outside the
+              data ({firstIndex} to {lastDate}) is replaced by the first or last date in the data.
+            </li>
+            <li>
+              <strong>Yearly cost.</strong> It stands for the fund’s fees and borrowing costs. 0.95% is a starting value,
+              so check the fund’s own page for its current expense ratio.
+            </li>
+            <li>
+              <strong>Borrowing costs.</strong> They rise with interest rates and are not in the expense ratio.
+            </li>
+          </ul>
         </div>
       </section>
 
@@ -156,12 +163,12 @@ export default function Leverage() {
             <tbody>
               <tr>
                 <td className="wrap-cell">
-                  What “{o.leverage}x” sounds like: {o.leverage} times the index’s total return
+                  {o.leverage} times the index’s total return
                 </td>
                 <td>{pct(naive)}</td>
               </tr>
               <tr>
-                <td className="wrap-cell">What {o.leverage}x each day delivered</td>
+                <td className="wrap-cell">{o.leverage}x of each day’s move, simulated</td>
                 <td>{pct(stats[1].s.totalReturn)}</td>
               </tr>
               <tr>
@@ -171,11 +178,22 @@ export default function Leverage() {
             </tbody>
           </table>
         </div>
-        <p className="note">
-          The fund multiplies each day’s move, not the move over the whole period. In a steady rise that compounds in
-          your favour. When prices swing up and down, every swing takes a piece that is never given back, and a fall of{' '}
-          {pct(1 / o.leverage, 0)} or more in a single day would wipe the fund out.
-        </p>
+        <ul className="points">
+          <li>
+            <strong>Daily, not whole-period.</strong> The fund multiplies each day’s move, not the move over the whole
+            period.
+          </li>
+          <li>
+            <strong>Steady rises.</strong> Daily compounding then adds to your return.
+          </li>
+          <li>
+            <strong>Prices that rise and fall.</strong> Each swing removes some value that is not recovered.
+          </li>
+          <li>
+            <strong>A large one-day fall.</strong> A fall of {pct(1 / o.leverage, 0)} or more in a single day would
+            reduce the fund to zero.
+          </li>
+        </ul>
 
         <div className="chart-box">
           <ResponsiveContainer width="100%" height="100%">
@@ -246,11 +264,18 @@ export default function Leverage() {
           </table>
         </div>
         <div className="panel">
-          <p>
-            <strong>Exchange-traded notes carry issuer risk.</strong> FNGU-style products are notes, not funds. A note is
-            an unsecured promise from the bank that issued it. If the bank fails, holders are creditors, whatever the
-            index did. The issuer can also redeem or delist a note early.
-          </p>
+          <ul className="points">
+            <li>
+              <strong>Notes carry issuer risk.</strong> FNGU-style products are exchange-traded notes, not funds. A note
+              is an unsecured promise from the bank that issued it.
+            </li>
+            <li>
+              <strong>If the bank fails.</strong> Holders are creditors, whatever the index did.
+            </li>
+            <li>
+              <strong>Early redemption.</strong> The issuer can also redeem or delist a note early.
+            </li>
+          </ul>
         </div>
       </section>
     </div>

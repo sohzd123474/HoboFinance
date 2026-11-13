@@ -308,14 +308,18 @@ export default function Explorer() {
             <input type="checkbox" checked={o.worstCase} onChange={(e) => set('worstCase', e.target.checked)} />
             Worst-case execution on rotations
           </label>
-          <p className="note">
-            Worst-case execution finds, for each rotation, the day that month with the widest high-to-low range, sells
-            the outgoing holding at that day’s low and buys the incoming one at that day’s high. It applies to
-            one-for-one rotations only; monthly purchases still use the month-end close.
-          </p>
+          <ul className="points">
+            <li>
+              <strong>What worst-case does.</strong> For each rotation, it finds the day that month with the widest high-to-low
+              range. It sells the outgoing holding at that day’s low and buys the incoming one at that day’s high.
+            </li>
+            <li>
+              <strong>Where it applies.</strong> One-for-one rotations only. Monthly purchases still use the month-end close.
+            </li>
+          </ul>
         </div>
 
-        {end <= start && <p className="warn">Choose an end date after the first purchase.</p>}
+        {end <= start && <p className="warn">The end date is not after the first purchase. Choose a later end date.</p>}
 
         <div className="table-scroll">
           <table className="data">
@@ -370,12 +374,24 @@ export default function Explorer() {
             </tbody>
           </table>
         </div>
-        <p className="note">
-          Growth a year is the time-weighted rate (CAGR), which ignores when money went in. Your return a year is the
-          money-weighted rate (IRR) on the monthly deposits. Volatility is the yearly spread of monthly returns. Sharpe
-          uses a risk-free rate of 0. Worst fall is the largest drop from a peak, measured at month ends. Prices include
-          reinvested dividends and exclude trading costs, tax and currency conversion.
-        </p>
+        <ul className="points">
+          <li>
+            <strong>Growth a year.</strong> The time-weighted rate (CAGR). It ignores when money went in.
+          </li>
+          <li>
+            <strong>Your return a year.</strong> The money-weighted rate (IRR) on the monthly deposits.
+          </li>
+          <li>
+            <strong>Volatility and Sharpe.</strong> Volatility is the yearly spread of monthly returns. Sharpe uses a risk-free
+            rate of 0.
+          </li>
+          <li>
+            <strong>Worst fall.</strong> The largest drop from a peak, measured at month ends.
+          </li>
+          <li>
+            <strong>Prices.</strong> They include reinvested dividends. They exclude trading costs, tax and currency conversion.
+          </li>
+        </ul>
 
         {warnings.length > 0 && (
           <div className="warn">
@@ -414,7 +430,7 @@ export default function Explorer() {
                 </LineChart>
               </ResponsiveContainer>
             </div>
-            <p className="note">Value in USD, including the money paid in each month. SPY is the dashed line. Hover or tap the chart for any month.</p>
+            <p className="note">Hover or tap the chart to see any month. Values are in USD and include the money paid in each month; SPY is the dashed line.</p>
             <details>
               <summary style={{ cursor: 'pointer', fontWeight: 600, padding: '0.4rem 0' }}>Show the value at the end of every year</summary>
               <div className="table-scroll" style={{ maxHeight: '24rem', overflowY: 'auto', marginTop: '0.5rem' }}>
@@ -530,8 +546,8 @@ export default function Explorer() {
           </table>
         </div>
         <p className="note">
-          Each period is run separately with the check frequency chosen above and the same monthly amount. These do not
-          change with the start and end dates.
+          Each period is run separately with the check frequency chosen above and the same monthly amount. The start and
+          end dates above do not change these results.
         </p>
       </section>
 
@@ -548,11 +564,21 @@ export default function Explorer() {
               </select>
             </div>
           </div>
-          <p className="note">
-            Both savers receive the same amount on the first trading day of each month. One invests it that day. The
-            other holds it as cash and invests everything on any day the close is 3% to 5% below the highest close of the
-            past year. Uses the dates and monthly amount from the backtest above.
-          </p>
+          <ul className="points">
+            <li>
+              <strong>Same money.</strong> Both savers receive the same amount on the first trading day of each month.
+            </li>
+            <li>
+              <strong>Buy every month.</strong> This saver invests it that day.
+            </li>
+            <li>
+              <strong>Buy dips only.</strong> This saver holds it as cash. They invest everything on any day the close is 3% to
+              5% below the highest close of the past year.
+            </li>
+            <li>
+              <strong>Same settings.</strong> The dates and monthly amount come from the backtest above.
+            </li>
+          </ul>
         </div>
         {dailyData.error && <p className="warn">{dailyData.error}</p>}
         {!daily && !dailyData.error && <p>Loading daily prices…</p>}
@@ -614,18 +640,22 @@ export default function Explorer() {
           </table>
         </div>
         <p className="note">
-          Worked out over {monthName(months[0])} to {monthName(last)} with USD 1,000 a month, whatever the controls above
-          are set to.
+          Worked out over {monthName(months[0])} to {monthName(last)} with USD 1,000 a month. The controls above do not
+          change these results.
         </p>
       </section>
 
       <section>
         <h2>What the table is built on</h2>
-        <p className="note">
-          The #1 history is a hand-researched table, not a data feed. {unsureSpans.length} of {NUMBER_ONE.length} changes
-          of #1 and {unsureRows.length} of {TOP7_QUARTERLY.length} quarterly top-7 rows could not be confirmed from two
-          sources and are marked unsure.
-        </p>
+        <ul className="points">
+          <li>
+            <strong>Hand-researched table.</strong> The #1 history is not a data feed.
+          </li>
+          <li>
+            <strong>Marked unsure.</strong> {unsureSpans.length} of {NUMBER_ONE.length} changes of #1 and {unsureRows.length} of{' '}
+            {TOP7_QUARTERLY.length} quarterly top-7 rows could not be confirmed from two sources.
+          </li>
+        </ul>
         <div className="table-scroll" style={{ maxHeight: '24rem', overflowY: 'auto' }}>
           <table className="data">
             <thead>

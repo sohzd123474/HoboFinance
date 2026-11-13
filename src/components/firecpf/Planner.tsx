@@ -153,19 +153,26 @@ export default function Planner() {
                 <NumField money id={`${id}-sal`} label="Monthly gross salary (S$)" value={p.salary} step={100} onChange={(v) => setPerson(i, { salary: v })} presets={k([0, 4000, 6000, 8000, 10000, 12000])} />
                 <NumField money id={`${id}-inv`} label="Invested each month (S$)" value={p.monthlyInvest} step={100} onChange={(v) => setPerson(i, { monthlyInvest: v })} presets={k([500, 1000, 2000, 3000, 5000])} />
               </div>
-              <p className="note">
-                Age now: {ageText(ages0[i] ?? 0)}. CPF contributions at this salary: {sgd(c.total)} a month ({sgd(c.oa)} to OA,{' '}
-                {sgd(c.sa)} to the {(ages0[i] ?? 0) > 55 * 12 ? 'Retirement' : 'Special'} Account, {sgd(c.ma)} to MediSave), of which{' '}
-                {sgd(c.employee)} comes out of your pay. If you are already past 55, enter your Retirement Account
-                balance as the Special Account.
-              </p>
+              <ul className="points">
+                <li>
+                  <strong>Age now.</strong> {ageText(ages0[i] ?? 0)}.
+                </li>
+                <li>
+                  <strong>CPF at this salary.</strong> {sgd(c.total)} a month: {sgd(c.oa)} to OA, {sgd(c.sa)} to the{' '}
+                  {(ages0[i] ?? 0) > 55 * 12 ? 'Retirement' : 'Special'} Account, {sgd(c.ma)} to MediSave. {sgd(c.employee)} of it
+                  comes out of your pay.
+                </li>
+                <li>
+                  <strong>Already past 55.</strong> Enter your Retirement Account balance as the Special Account.
+                </li>
+              </ul>
               {p.salary > 0 && p.salary <= 750 && (
-                <p className="warn">Salaries of S$750 a month or less use lower graduated rates. This tool applies the full rates, so contributions are overstated.</p>
+                <p className="warn">This tool applies the full CPF rates, but salaries of S$750 a month or less use lower graduated rates. The contributions shown are overstated.</p>
               )}
             </div>
           );
         })}
-        {plan.couple && <p className="note">For a couple, both liquid portfolios are treated as one pot that pays the household spending. CPF stays separate for each person.</p>}
+        {plan.couple && <p className="note">Both liquid portfolios are combined into one portfolio that pays the household spending. CPF stays separate for each person.</p>}
       </section>
 
       <section>
@@ -177,13 +184,22 @@ export default function Planner() {
             <NumField money id="fc-spend" label="Household spending a year (S$, today’s dollars)" value={plan.annualSpend} step={1000} onChange={(v) => set('annualSpend', v)} presets={k([36000, 48000, 60000, 72000, 96000])} />
             <NumField id="fc-wr" label="Withdrawal rate (% a year)" value={plan.withdrawalRatePct} step={0.1} onChange={(v) => set('withdrawalRatePct', v)} presets={pctChips([3, 3.5, 4, 4.5])} />
           </div>
-          <p className="note">
-            Everything on this page is in today’s dollars. The expected return and the CPF interest rates are entered
-            before inflation; the model takes inflation off each of them every month, so a {plan.returnPct}% return with{' '}
-            {plan.inflationPct}% inflation grows your buying power by about{' '}
-            {(((1 + plan.returnPct / 100) / (1 + plan.inflationPct / 100) - 1) * 100).toFixed(1)}% a year. Salary, monthly investing and spending are
-            assumed to keep pace with inflation.
-          </p>
+          <ul className="points">
+            <li>
+              <strong>Today’s dollars.</strong> Every figure on this page is in today’s dollars.
+            </li>
+            <li>
+              <strong>Rates before inflation.</strong> Enter the expected return and the CPF interest rates before inflation. The
+              model takes inflation off each of them every month.
+            </li>
+            <li>
+              <strong>Growth after inflation.</strong> A {plan.returnPct}% return with {plan.inflationPct}% inflation grows your
+              buying power by about {(((1 + plan.returnPct / 100) / (1 + plan.inflationPct / 100) - 1) * 100).toFixed(1)}% a year.
+            </li>
+            <li>
+              <strong>Rises with inflation.</strong> Salary, monthly investing and spending are assumed to rise with inflation.
+            </li>
+          </ul>
           <div className="controls">
             <div>
               <span className="ctl-label" id="fc-stop">
@@ -208,17 +224,24 @@ export default function Planner() {
               <NumField id="fc-fee" label="CPFIS fees (% a year, taken off the return)" value={plan.cpfisFeePct} step={0.1} onChange={(v) => set('cpfisFeePct', v)} presets={pctChips([0, 0.3, 0.5, 1])} />
             </div>
           )}
-          <p className="note">
-            With this on, any OA cash above {sgd(plan.rules.cpfisOaFloor)} moves into CPFIS investments each month until 55. The
-            first {sgd(plan.rules.cpfisOaFloor)} of OA cannot be invested. When CPFIS investments are sold the money goes back to OA,
-            not to your bank account.
-          </p>
+          <ul className="points">
+            <li>
+              <strong>What moves.</strong> With this on, OA cash above {sgd(plan.rules.cpfisOaFloor)} moves into CPFIS investments
+              each month until 55.
+            </li>
+            <li>
+              <strong>What stays.</strong> The first {sgd(plan.rules.cpfisOaFloor)} of OA cannot be invested.
+            </li>
+            <li>
+              <strong>Sale proceeds.</strong> Money from selling CPFIS investments goes back to OA, not to your bank account.
+            </li>
+          </ul>
         </div>
       </section>
 
       <section>
         <h2>Events</h2>
-        <p className="note">All optional. Switch on the ones that apply and set a date.</p>
+        <p className="note">Switch on the events that apply and set a date. All are optional.</p>
 
         <details className="panel" open={plan.bto.on}>
           <summary>
@@ -246,12 +269,23 @@ export default function Planner() {
               Instalment used: {calc.sim.instalment > 0 ? `${sgd(calc.sim.instalment)} a month for ${plan.bto.tenureYears} years from key collection` : 'n/a: enter a loan amount and tenure, or an instalment'}.
             </p>
           )}
-          <p className="note">
-            The downpayment comes from OA, shared equally for a couple. If OA cash is short, CPFIS investments are sold
-            into OA to cover it, then the liquid portfolio pays the rest. Each instalment is paid from OA first; if OA
-            is short the liquid portfolio pays the remainder, and the year-by-year table says so. A key collection date
-            in the past means the loan is already running: no downpayment is taken and the instalment applies from now. Instalments are paid on top of the household spending figure, so leave the mortgage out of that figure.
-          </p>
+          <ul className="points">
+            <li>
+              <strong>Downpayment from OA.</strong> A couple shares it equally. If OA cash is short, CPFIS investments are sold
+              into OA, then the liquid portfolio pays the rest.
+            </li>
+            <li>
+              <strong>Instalments from OA first.</strong> If OA is short, the liquid portfolio pays the remainder. The
+              year-by-year table notes when this happens.
+            </li>
+            <li>
+              <strong>Key collection in the past.</strong> The loan is treated as already running. No downpayment is taken and
+              the instalment applies from now.
+            </li>
+            <li>
+              <strong>Leave the mortgage out of spending.</strong> Instalments are paid on top of the household spending figure.
+            </li>
+          </ul>
         </details>
 
         <details className="panel" open={plan.reno.on}>
@@ -263,18 +297,25 @@ export default function Planner() {
             <MonthField id="fc-reno-date" label="Paid in" value={plan.reno.date} onChange={(v) => setReno({ date: v })} fromYear={thisYear} toYear={thisYear + 40} yearsAhead={[0, 1, 2, 3, 5]} thisYear={thisYear} />
             <NumField money id="fc-reno-amt" label="Cash cost (S$)" value={plan.reno.amount} step={1000} onChange={(v) => setReno({ amount: v })} presets={k([30000, 50000, 80000, 100000])} />
           </div>
-          <p className="note">Taken from the liquid portfolio in one go. CPF cannot be used for renovation.</p>
-          {plan.reno.on && past(plan.reno.date) && <p className="warn">This date is in the past, so nothing is taken.</p>}
+          <p className="note">Paid from the liquid portfolio in one payment. CPF cannot be used for renovation.</p>
+          {plan.reno.on && past(plan.reno.date) && <p className="warn">This date is in the past, so nothing is taken. Choose a later date to include the cost.</p>}
         </details>
 
         <details className="panel" open={plan.people.slice(0, count).some((p) => p.exitOn)}>
           <summary>
             <strong>Job exit</strong> ({plan.people.slice(0, count).some((p) => p.exitOn) ? 'on' : 'off'})
           </summary>
-          <p className="note">
-            Leaving employment before you stop work for good, for example to freelance. Salary CPF contributions stop
-            from this date; monthly investing carries on unless you also set a reduced-investing period.
-          </p>
+          <ul className="points">
+            <li>
+              <strong>When to use it.</strong> You leave employment before you stop work completely, for example to freelance.
+            </li>
+            <li>
+              <strong>What stops.</strong> Salary CPF contributions stop from this date.
+            </li>
+            <li>
+              <strong>What continues.</strong> Monthly investing continues unless you also set a period of reduced investing.
+            </li>
+          </ul>
           {plan.people.slice(0, count).map((p, i) => {
             const id = `fc-exit${i}`;
             const exitAge = Math.floor(((ages0[i] ?? 0) + Math.max(0, monthIndex(start, p.exitDate) ?? 0)) / 12);
@@ -304,12 +345,20 @@ export default function Planner() {
               </div>
             );
           })}
-          <p className="note">
-            Self-employed people must contribute to MediSave only, based on yearly net trade income and age. Enter your
-            income and press the button to fill in the amount from the 2026 table (using your age at the exit date), or
-            type your own. The contribution is assumed to be paid from income outside this plan and stops when you stop
-            work.
-          </p>
+          <ul className="points">
+            <li>
+              <strong>MediSave only.</strong> Self-employed people must contribute to MediSave only. The amount depends on yearly
+              net trade income and age.
+            </li>
+            <li>
+              <strong>Fill in the amount.</strong> Enter your income, then press the button to use the 2026 table at your age on
+              the exit date. Or type your own amount.
+            </li>
+            <li>
+              <strong>Paid from outside the plan.</strong> The contribution is assumed to come from income outside this plan. It
+              stops when you stop work.
+            </li>
+          </ul>
         </details>
 
         <details className="panel" open={plan.reduced.on}>
@@ -323,7 +372,7 @@ export default function Planner() {
             <NumField money id="fc-red-amt" label={plan.couple ? 'Household investing each month in that period (S$)' : 'Invested each month in that period (S$)'} value={plan.reduced.monthly} step={100} onChange={(v) => setReduced({ monthly: v })} presets={k([0, 500, 1000, 1500])} />
           </div>
           {plan.reduced.on && (monthIndex(start, plan.reduced.end) ?? 0) < (monthIndex(start, plan.reduced.start) ?? 0) && (
-            <p className="warn">The end is before the start, so this period has no effect.</p>
+            <p className="warn">The end is before the start, so this period has no effect. Choose an end date after the start.</p>
           )}
         </details>
       </section>
@@ -344,18 +393,28 @@ export default function Planner() {
               </button>
             </div>
           </div>
-          <p className="note">
-            At 55 the Special Account closes. The model sells CPFIS investments into OA, moves Special Account then OA
-            savings into the Retirement Account up to the sum chosen here, and moves whatever is left to the liquid
-            portfolio. If your savings do not reach the sum, only {sgd(WITHDRAWAL_RULE.value.minimum)} comes out.
-          </p>
+          <ul className="points">
+            <li>
+              <strong>Special Account closes.</strong> This happens at 55. The model then sells CPFIS investments into OA.
+            </li>
+            <li>
+              <strong>Retirement Account is filled.</strong> Special Account savings move in first, then OA savings, up to the
+              sum chosen here.
+            </li>
+            <li>
+              <strong>The rest is withdrawn.</strong> Whatever is left moves to the liquid portfolio.
+            </li>
+            <li>
+              <strong>Savings below the sum.</strong> Only {sgd(WITHDRAWAL_RULE.value.minimum)} comes out.
+            </li>
+          </ul>
         </div>
 
         <details className="panel">
           <summary>
             <strong>CPF rates used</strong> ({rulesChanged ? 'changed from the published values' : `as published, checked ${FRS_BY_YEAR.asOf}`})
           </summary>
-          <p className="note">CPF rules change. If a figure here is out of date, correct it and the plan updates.</p>
+          <p className="note">Correct any figure here that is out of date and the plan updates. CPF rules change.</p>
           <div className="controls">
             <NumField id="fc-r-oa" label="OA interest (% a year)" value={plan.rules.oaRatePct} step={0.1} onChange={(v) => setRule({ oaRatePct: v })} presets={published('oaRatePct', 'pct')} />
             <NumField id="fc-r-sm" label="Special, MediSave and Retirement Account interest (% a year)" value={plan.rules.smraRatePct} step={0.1} onChange={(v) => setRule({ smraRatePct: v })} presets={published('smraRatePct', 'pct')} />
@@ -373,7 +432,7 @@ export default function Planner() {
             Reset to the published values
           </button>
           <p className="note">
-            Contribution rates above 55 and the split between accounts are in the table below and cannot be changed here.
+            Contribution rates above 55 and the split between accounts cannot be changed here. They are in the table below.
             Figures marked {unverified} could not be confirmed on cpf.gov.sg.
           </p>
         </details>
