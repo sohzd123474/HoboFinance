@@ -5,8 +5,10 @@ export type ValueKind = 'money' | 'years' | 'text';
 export interface Field {
   id: string;
   label: string;
-  unit: 'money' | 'percent' | 'years';
+  unit: 'money' | 'percent' | 'years' | 'count';
   value: number;
+  /** Quick-pick buttons shown under the input. */
+  presets?: (number | { label: string; value: number })[];
   min: number;
   max: number;
   step: number;
@@ -43,10 +45,10 @@ export const calculators: Calculator[] = [
     title: 'Compound interest',
     blurb: 'See what regular saving grows into once interest starts earning interest.',
     fields: [
-      { id: 'principal', label: 'Starting amount', unit: 'money', value: 1000, min: 0, max: 100000000, step: 100 },
-      { id: 'monthly', label: 'Added each month', unit: 'money', value: 200, min: 0, max: 1000000, step: 10 },
-      { id: 'rate', label: 'Yearly growth', unit: 'percent', value: 6, min: 0, max: 30, step: 0.1 },
-      { id: 'years', label: 'Time', unit: 'years', value: 20, min: 1, max: 60, step: 1 },
+      { id: 'principal', label: 'Starting amount', unit: 'money', value: 1000, min: 0, max: 100000000, step: 100, presets: [0, 1000, 10000, 50000] },
+      { id: 'monthly', label: 'Added each month', unit: 'money', value: 200, min: 0, max: 1000000, step: 10, presets: [100, 200, 500, 1000, 2000] },
+      { id: 'rate', label: 'Yearly growth', unit: 'percent', value: 6, min: 0, max: 30, step: 0.1, presets: [2.5, 4, 6, 8, 10] },
+      { id: 'years', label: 'Time', unit: 'years', value: 20, min: 1, max: 60, step: 1, presets: [5, 10, 20, 30, 40] },
     ],
     compute: (v) => {
       const g = futureValue(v.principal, v.monthly, v.rate, v.years);
@@ -70,9 +72,9 @@ export const calculators: Calculator[] = [
     title: 'Loan repayment',
     blurb: 'Work out the monthly repayment on a home, car or personal loan, and what it costs in interest.',
     fields: [
-      { id: 'amount', label: 'Amount borrowed', unit: 'money', value: 300000, min: 100, max: 100000000, step: 1000 },
-      { id: 'rate', label: 'Interest rate per year', unit: 'percent', value: 4, min: 0, max: 40, step: 0.05 },
-      { id: 'years', label: 'Loan length', unit: 'years', value: 25, min: 1, max: 40, step: 1 },
+      { id: 'amount', label: 'Amount borrowed', unit: 'money', value: 300000, min: 100, max: 100000000, step: 1000, presets: [20000, 100000, 300000, 500000, 800000] },
+      { id: 'rate', label: 'Interest rate per year', unit: 'percent', value: 4, min: 0, max: 40, step: 0.05, presets: [2.6, 3, 3.5, 4, 5] },
+      { id: 'years', label: 'Loan length', unit: 'years', value: 25, min: 1, max: 40, step: 1, presets: [5, 7, 15, 25, 30] },
     ],
     compute: (v) => {
       const l = loanRepayment(v.amount, v.rate, v.years);
@@ -96,10 +98,10 @@ export const calculators: Calculator[] = [
     title: 'Savings goal',
     blurb: 'Find the monthly amount that gets you to a target by a date you choose.',
     fields: [
-      { id: 'target', label: 'Target amount', unit: 'money', value: 50000, min: 1, max: 100000000, step: 500 },
-      { id: 'current', label: 'Saved so far', unit: 'money', value: 5000, min: 0, max: 100000000, step: 100 },
-      { id: 'rate', label: 'Yearly interest', unit: 'percent', value: 3, min: 0, max: 30, step: 0.1 },
-      { id: 'years', label: 'Time to get there', unit: 'years', value: 5, min: 1, max: 50, step: 1 },
+      { id: 'target', label: 'Target amount', unit: 'money', value: 50000, min: 1, max: 100000000, step: 500, presets: [10000, 50000, 100000, 500000] },
+      { id: 'current', label: 'Saved so far', unit: 'money', value: 5000, min: 0, max: 100000000, step: 100, presets: [0, 5000, 20000, 50000] },
+      { id: 'rate', label: 'Yearly interest', unit: 'percent', value: 3, min: 0, max: 30, step: 0.1, presets: [0, 2.5, 3, 4, 6] },
+      { id: 'years', label: 'Time to get there', unit: 'years', value: 5, min: 1, max: 50, step: 1, presets: [1, 3, 5, 10, 20] },
     ],
     compute: (v) => {
       const s = savingsGoal(v.target, v.current, v.rate, v.years);
@@ -124,11 +126,11 @@ export const calculators: Calculator[] = [
     title: 'Financial independence',
     blurb: 'Estimate the pot you need to live off your investments, and how many years of saving it takes.',
     fields: [
-      { id: 'spend', label: 'Yearly spending', unit: 'money', value: 36000, min: 1, max: 10000000, step: 500 },
-      { id: 'withdrawal', label: 'Withdrawal rate', unit: 'percent', value: 4, min: 1, max: 10, step: 0.1, hint: 'Share of the pot you spend each year. 4% is the usual starting point.' },
-      { id: 'current', label: 'Invested so far', unit: 'money', value: 20000, min: 0, max: 100000000, step: 1000 },
-      { id: 'monthly', label: 'Invested each month', unit: 'money', value: 1500, min: 0, max: 1000000, step: 50 },
-      { id: 'rate', label: 'Yearly return after inflation', unit: 'percent', value: 5, min: 0, max: 15, step: 0.1 },
+      { id: 'spend', label: 'Yearly spending', unit: 'money', value: 36000, min: 1, max: 10000000, step: 500, presets: [24000, 36000, 48000, 60000, 90000] },
+      { id: 'withdrawal', label: 'Withdrawal rate', unit: 'percent', value: 4, min: 1, max: 10, step: 0.1, hint: 'Share of the pot you spend each year. 4% is the usual starting point.', presets: [3, 3.5, 4, 5] },
+      { id: 'current', label: 'Invested so far', unit: 'money', value: 20000, min: 0, max: 100000000, step: 1000, presets: [0, 20000, 100000, 300000] },
+      { id: 'monthly', label: 'Invested each month', unit: 'money', value: 1500, min: 0, max: 1000000, step: 50, presets: [500, 1000, 1500, 3000, 5000] },
+      { id: 'rate', label: 'Yearly return after inflation', unit: 'percent', value: 5, min: 0, max: 15, step: 0.1, presets: [3, 4, 5, 7] },
     ],
     compute: (v) => {
       const f = fire(v.spend, v.withdrawal, v.current, v.monthly, v.rate);
@@ -149,6 +151,124 @@ export const calculators: Calculator[] = [
       'Using a return after inflation keeps every figure in today’s money. The 4% rate comes from studies of 30-year retirements in US markets; a longer retirement or different markets may call for a lower rate.',
     ],
   },
+  {
+    slug: 'early-retirement',
+    title: 'Early retirement',
+    blurb: 'How many years until you can stop working, based on how much of your income you save.',
+    fields: [
+      { id: 'income', label: 'Take-home pay a year', unit: 'money', value: 60000, min: 1, max: 10000000, step: 1000, presets: [36000, 60000, 84000, 120000, 180000] },
+      { id: 'rate', label: 'Share of pay you save', unit: 'percent', value: 30, min: 0, max: 99, step: 1, presets: [10, 20, 30, 50, 70] },
+      { id: 'current', label: 'Invested so far', unit: 'money', value: 0, min: 0, max: 100000000, step: 1000, presets: [0, 20000, 100000, 300000] },
+      { id: 'ret', label: 'Yearly return after inflation', unit: 'percent', value: 5, min: 0, max: 15, step: 0.1, presets: [3, 4, 5, 7] },
+      { id: 'withdrawal', label: 'Withdrawal rate', unit: 'percent', value: 4, min: 1, max: 10, step: 0.1, hint: 'Share of the pot you spend each year once retired.', presets: [3, 3.5, 4, 5] },
+    ],
+    compute: (v) => {
+      const saved = (v.income * v.rate) / 100;
+      const spend = v.income - saved;
+      const at = (ratePct: number) => fire(v.income * (1 - ratePct / 100), v.withdrawal, v.current, (v.income * ratePct) / 100 / 12, v.ret);
+      const f = at(v.rate);
+      const others = [10, 25, 50, 75].filter((r) => r !== v.rate);
+      const yearsRow = (label: string, y: number | null): Figure =>
+        y === null ? { label, value: 'More than 100 years', kind: 'text' } : { label, value: y, kind: 'years' };
+      return {
+        headline: yearsRow('Years until you can retire', f.years),
+        rows: [
+          { label: 'You save each year', value: saved, kind: 'money' },
+          { label: 'You spend each year', value: spend, kind: 'money' },
+          { label: 'Pot you need', value: f.target, kind: 'money' },
+          ...others.map((r) => yearsRow(`If you saved ${r}% instead`, at(r).years)),
+        ],
+        series: f.series,
+        legend: ['You put in', 'Growth'],
+        note: f.years === null ? 'At this savings rate the pot never reaches the target. Try saving a larger share.' : undefined,
+      };
+    },
+    explain: [
+      'Whatever you do not save, you spend. The pot you need is that yearly spending divided by the withdrawal rate. Saving more helps twice: the pot grows faster and the target gets smaller, because you have shown you can live on less.',
+      'It assumes your pay and spending stay the same in today’s money, and that returns arrive evenly. It leaves out CPF; for a Singapore plan that includes it, use the FIRE and CPF tool once it is listed under Tools.',
+    ],
+  },
+  {
+    slug: 'recurring-cost',
+    title: 'Recurring cost',
+    blurb: 'What a regular expense really costs over time, and the capital that would pay for it from investment income.',
+    fields: [
+      { id: 'amount', label: 'Cost each time', unit: 'money', value: 20, min: 0.01, max: 1000000, step: 1, presets: [5, 10, 20, 50, 100, 500] },
+      {
+        id: 'times',
+        label: 'How often',
+        unit: 'count',
+        value: 12,
+        min: 1,
+        max: 1000,
+        step: 1,
+        hint: 'Times a year. Use the buttons or type any number.',
+        presets: [
+          { label: 'Daily', value: 365 },
+          { label: 'Weekdays', value: 260 },
+          { label: 'Weekly', value: 52 },
+          { label: 'Monthly', value: 12 },
+          { label: 'Yearly', value: 1 },
+        ],
+      },
+      { id: 'years', label: 'Over how long', unit: 'years', value: 10, min: 1, max: 60, step: 1, presets: [5, 10, 20, 30] },
+      { id: 'ret', label: 'Return if invested instead', unit: 'percent', value: 6, min: 0, max: 30, step: 0.1, presets: [2.5, 4, 6, 8] },
+      { id: 'yield', label: 'Income your capital pays', unit: 'percent', value: 4, min: 0.1, max: 20, step: 0.1, hint: 'Dividend yield, or the share of the capital you would draw each year.', presets: [2.5, 3, 4, 5, 6] },
+    ],
+    compute: (v) => {
+      const yearly = v.amount * v.times;
+      const g = futureValue(0, yearly / 12, v.ret, v.years);
+      return {
+        headline: { label: 'Capital that makes it free', value: yearly / (v.yield / 100), kind: 'money' },
+        rows: [
+          { label: 'Cost each year', value: yearly, kind: 'money' },
+          { label: `Paid over ${v.years} years`, value: yearly * v.years, kind: 'money' },
+          { label: `Worth if invested instead`, value: g.balance, kind: 'money' },
+          { label: 'Growth you give up', value: g.interest, kind: 'money' },
+        ],
+        series: g.series,
+        legend: ['You paid', 'Growth given up'],
+      };
+    },
+    explain: [
+      'The capital that makes it free is the yearly cost divided by the income rate: at 4%, that is 25 times the yearly cost. Invested capital of that size pays the expense from its income, leaving the capital itself untouched.',
+      'Worth if invested instead is what the same payments would grow to if you put them into investments each month at the return you chose. Dividends and returns are not guaranteed, prices rise over time, and dividends may be taxed depending on where the fund is based.',
+    ],
+  },
+  {
+    slug: 'dollar-at-retirement',
+    title: 'What a dollar becomes',
+    blurb: 'What money set aside today is worth by the time you retire, at six different rates of return.',
+    fields: [
+      { id: 'amount', label: 'Amount today', unit: 'money', value: 1, min: 0.01, max: 100000000, step: 1, presets: [1, 100, 1000, 10000, 100000] },
+      { id: 'age', label: 'Your age', unit: 'years', value: 30, min: 0, max: 99, step: 1, presets: [{ label: '20', value: 20 }, { label: '25', value: 25 }, { label: '30', value: 30 }, { label: '35', value: 35 }, { label: '40', value: 40 }, { label: '50', value: 50 }] },
+      { id: 'retire', label: 'Age you want to retire', unit: 'years', value: 65, min: 1, max: 100, step: 1, presets: [{ label: '45', value: 45 }, { label: '55', value: 55 }, { label: '60', value: 60 }, { label: '65', value: 65 }, { label: '70', value: 70 }] },
+    ],
+    compute: (v) => {
+      const span = Math.max(0, v.retire - v.age);
+      return {
+        headline: { label: 'Time to grow', value: span, kind: 'years' },
+        rows: DOLLAR_RATES.map((r) => ({ label: `${r.rate}%: ${r.label}`, value: v.amount * Math.pow(1 + r.rate / 100, span), kind: 'money' as const })),
+        series: [],
+        legend: [],
+        note: v.retire <= v.age ? 'Choose a retirement age above your current age to see any growth.' : undefined,
+      };
+    },
+    explain: [
+      'Each line is the amount multiplied by (1 + rate) once for every year until you retire, with nothing added along the way. The same sum grows very differently depending on the rate, and the gap widens with every extra year.',
+      'The rates are examples, not promises. 2.5% and 4% are the current floor rates on CPF accounts. 7% is close to what the S&P 500 has returned after inflation over the long run and 10% before inflation. 15% a year has happened over single decades but has never lasted a working lifetime. Amounts are not adjusted for rising prices.',
+    ],
+  },
+];
+
+/** Rates compared in the "what a dollar becomes" calculator. */
+export const DOLLAR_RATES = [
+  { rate: 2.5, label: 'CPF Ordinary Account' },
+  { rate: 4, label: 'CPF Special and MediSave' },
+  { rate: 5, label: 'dividend shares' },
+  { rate: 7, label: 'S&P 500 after inflation' },
+  { rate: 10, label: 'S&P 500 long-run average' },
+  { rate: 15, label: 'an exceptional run' },
 ];
 
 export const bySlug = (slug: string) => calculators.find((c) => c.slug === slug);

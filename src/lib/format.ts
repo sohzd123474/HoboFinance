@@ -29,7 +29,8 @@ export function money(n: number): string {
     style: 'currency',
     currency: getCurrency(),
     currencyDisplay: 'narrowSymbol',
-    maximumFractionDigits: 0,
+    // Small amounts keep their cents; large ones are rounded to whole units.
+    maximumFractionDigits: Math.abs(n) < 100 ? 2 : 0,
   }).format(n);
 }
 
