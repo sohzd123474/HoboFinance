@@ -1,0 +1,23 @@
+---
+import Base from '../../layouts/Base.astro';
+import Ssb from '../../components/ssb/Ssb.tsx';
+---
+
+<Base
+  title="Savings Bonds tracker"
+  description="Every Singapore Savings Bond issue since October 2015, the change from month to month, and whether each one beats leaving money in CPF OA at 2.5% for 10 years."
+>
+  <div class="wrap page-head">
+    <h1>Savings Bonds tracker</h1>
+    <p class="lede">
+      The rates on every Singapore Savings Bond issue, how they change from month to month, and how each compares with
+      money left in the CPF Ordinary Account.
+    </p>
+  </div>
+
+  <div class="wrap">
+    <Ssb client:only="react">
+      <p slot="fallback" style="margin-top:2rem">Loading Savings Bond data…</p>
+    </Ssb>
+  </div>
+</Base>

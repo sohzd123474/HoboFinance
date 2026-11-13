@@ -1,0 +1,22 @@
+---
+import Base from '../../layouts/Base.astro';
+import Parking from '../../components/parking/Parking.tsx';
+---
+
+<Base
+  title="Short-term parking and reading list"
+  description="Where to keep money you need within about two years in Singapore (Savings Bonds, T-bills, money market funds), a simple interest calculator, and a short reading and tools list."
+>
+  <div class="wrap page-head">
+    <h1>Short-term parking and reading list</h1>
+    <p class="lede">
+      Where to keep money you will need within about two years, what it would earn, and a short list of books and tools.
+    </p>
+  </div>
+
+  <div class="wrap">
+    <Parking client:only="react">
+      <p slot="fallback" style="margin-top:2rem">Loading the calculator…</p>
+    </Parking>
+  </div>
+</Base>

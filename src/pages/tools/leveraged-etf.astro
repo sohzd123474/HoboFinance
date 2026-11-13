@@ -1,0 +1,19 @@
+---
+import Base from '../../layouts/Base.astro';
+import Leverage from '../../components/leverage/Leverage.tsx';
+---
+
+<Base
+  title="Leveraged ETF check"
+  description="What a 3x daily leveraged fund does over months and years, worked out from real Nasdaq-100 prices."
+>
+  <div class="wrap page-head">
+    <h1>Leveraged ETF check</h1>
+    <p class="lede">A 3x fund triples each day’s move, which is not the same as tripling your return. See the difference on real prices.</p>
+  </div>
+  <div class="wrap">
+    <Leverage client:only="react">
+      <p slot="fallback" style="margin-top:2rem">Loading daily prices…</p>
+    </Leverage>
+  </div>
+</Base>

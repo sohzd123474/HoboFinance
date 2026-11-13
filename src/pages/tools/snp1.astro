@@ -1,0 +1,69 @@
+---
+import Base from '../../layouts/Base.astro';
+import Explorer from '../../components/snp1/Explorer.tsx';
+---
+
+<Base
+  title="SNP1 strategy"
+  description="Hold the single largest US company by market value and check the ranking once a month. Backtested from 2000 against SPY."
+>
+  <div class="wrap page-head">
+    <h1>SNP1 strategy</h1>
+    <p class="lede">
+      Hold the single largest US company by market value. Check the ranking on the 1st of each month, switch only if #1
+      has changed, and add new money monthly.
+    </p>
+  </div>
+
+  <div class="wrap">
+    <Explorer client:only="react">
+      <p slot="fallback" style="margin-top:2rem">Loading the backtest…</p>
+    </Explorer>
+
+    <section class="context">
+      <h2>How to read this</h2>
+      <div class="panel">
+        <p>
+          <strong>This is a concentrated bet that works in some decades and fails in others.</strong> Michael Mauboussin
+          and Dan Callahan at Counterpoint Global studied US stocks from 1950 to 2023 using CRSP data. They report that
+          owning the largest stock trailed the S&amp;P 500 by about 4.3 percentage points a year over the full period,
+          but beat it by about 14 points a year from 2014 to 2023. The years 2000 to 2013 were poor: the largest
+          companies then were Microsoft, General Electric and Cisco.
+        </p>
+        <p>
+          The largest company is usually there because its price has risen a lot. Holding it is a bet that the rise
+          continues. Treat a good recent record as a feature of the period, not proof of the rule.
+        </p>
+        <p class="note">
+          Figures in this box are as reported in “Stock Market Concentration” (Counterpoint Global, Morgan Stanley
+          Investment Management, 2024). They are not recomputed here.
+        </p>
+      </div>
+
+      <h2>Survivorship bias</h2>
+      <div class="panel">
+        <p>
+          The ranking table was researched after the fact, from sources that are easier to find for companies that are
+          still large today. Prices come from a source that drops delisted companies. Both make the past look tidier
+          than it was to live through. No company that reached #1 since 2000 has been delisted, so the SNP1 line is less
+          affected than the top-7 variants, where rows marked unsure matter more.
+        </p>
+      </div>
+    </section>
+  </div>
+</Base>
+
+<style>
+  .context {
+    margin-top: 2.5rem;
+    display: grid;
+    gap: 0.9rem;
+  }
+  .context h2 {
+    font-size: var(--step-2);
+    margin-top: 1rem;
+  }
+  .context .panel p {
+    max-width: var(--measure);
+  }
+</style>

@@ -1,0 +1,23 @@
+---
+import Base from '../../layouts/Base.astro';
+import TaxDrag from '../../components/taxdrag/TaxDrag.tsx';
+---
+
+<Base
+  title="ETF tax-drag calculator for Singapore"
+  description="Compare the yearly cost of US-domiciled ETFs (SPY, VOO, QQQ) with Ireland-domiciled UCITS ETFs (CSPX, SPYL, VWRA, IWDA, EIMI) for a Singapore tax resident: fees, dividend withholding tax and US estate tax."
+>
+  <div class="wrap page-head">
+    <h1>ETF tax-drag calculator</h1>
+    <p class="lede">
+      Compare what a US-domiciled ETF and an Ireland-domiciled ETF cost a Singapore tax resident each year in fees and
+      dividend withholding tax.
+    </p>
+  </div>
+
+  <div class="wrap">
+    <TaxDrag client:only="react">
+      <p slot="fallback" style="margin-top:2rem">Loading the calculator…</p>
+    </TaxDrag>
+  </div>
+</Base>
