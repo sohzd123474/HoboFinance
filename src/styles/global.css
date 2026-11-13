@@ -663,3 +663,34 @@ table.data th.wrap-cell {
     height: 17rem;
   }
 }
+
+/* Keep input boxes on one line across a row: cells align to the top, and on
+   wide screens every label reserves two lines and sits at the bottom of them,
+   so a wrapped label does not push its box lower than its neighbours. */
+.controls {
+  align-items: start;
+}
+.controls > div > label:first-child,
+.controls > div > .ctl-label:first-child {
+  line-height: 1.3;
+}
+@media (min-width: 34.01rem) {
+  .controls > div > label:first-child,
+  .controls > div > .ctl-label:first-child {
+    display: flex;
+    align-items: flex-end;
+    flex-wrap: wrap;
+    column-gap: 0.4em;
+    min-height: 2.6em;
+  }
+}
+.controls input[type='number'],
+.controls input[type='text'],
+.controls select,
+.seg button {
+  height: 2.6rem;
+  min-height: 0;
+}
+.suffix-wrap .suffix {
+  height: 2.6rem;
+}
