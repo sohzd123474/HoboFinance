@@ -33,31 +33,44 @@ const stage = (title: string, intro: string, steps: (Step | null)[]): Stage => (
 });
 
 export const stages: Stage[] = [
-  stage('Your first pay', 'See where your money goes and what saving a part of it does.', [
+  stage('Know where your money goes', 'A budget is a map of your money. Start by seeing the split, then look at what the regular costs add up to.', [
+    calc('budget', 'How should I split my pay between needs, wants and saving?'),
     calc('recurring-cost', 'What do my subscriptions and daily habits really cost?'),
-    calc('dollar-at-retirement', 'What is a dollar saved today worth when I retire?'),
-    calc('early-retirement', 'How does the share of pay I save change when I can stop working?'),
   ]),
-  stage('A safety buffer', 'Before investing, set aside money you can reach quickly.', [
-    calc('savings-goal', 'How much a month gets me to my emergency fund?'),
+  stage('Build a safety net', 'Before investing, set aside cash for a job loss or a large bill, somewhere you can reach it quickly.', [
+    calc('emergency-fund', 'How big should my emergency fund be, and how long will it take?'),
     tool('parking', 'Where do I keep money I will need within two years?'),
     tool('ssb', 'Are Savings Bonds worth it this month?'),
   ]),
-  stage('Starting to invest', 'Pick a low-cost way in and understand what you are paying.', [
+  stage('Understand your CPF', 'CPF is saving you are already doing. See what it adds and what steady saving grows into.', [
+    calc('early-retirement', 'How much am I really saving once CPF is counted?'),
+    calc('dollar-at-retirement', 'What is a dollar saved today worth when I retire?'),
+  ]),
+  stage('Protect yourself', 'Insurance is protection, not an investment. Cover the events that could wipe out everything else.', [
+    calc('insurance-cover', 'Roughly how much cover do I need, and what does MediSave pay for?'),
+  ]),
+  stage('Save for the next few years', 'Money for a wedding, a renovation or a home should not be in shares.', [
+    calc('savings-goal', 'How much a month gets me to a goal by a set date?'),
+    calc('loan-repayment', 'What will a home loan cost each month, and how much is interest?'),
+  ]),
+  stage('Start investing', 'Buy the whole market at low cost and keep adding. Know what each layer of fees takes.', [
     calc('compound-interest', 'What does investing every month grow into?'),
+    calc('time-to-target', 'How long until I reach 1 million?'),
     tool('etf-tax-drag', 'Which S&P 500 or world fund costs a Singapore investor least?'),
+    calc('fx-cost', 'What does my broker’s exchange rate cost me?'),
     tool('ilp-vs-diy', 'Someone is selling me an investment-linked policy. How does it compare?'),
   ]),
-  stage('Buying a home', 'Work out the loan and what it does to the rest of your plan.', [
-    calc('loan-repayment', 'What will the monthly repayment be, and how much is interest?'),
-    tool('fire-cpf', 'How do the downpayment and mortgage change my CPF and savings?'),
+  stage('Stay invested', 'Falls are normal. Knowing how often they happen makes it easier not to sell.', [
+    tool('drawdowns', 'How far do markets fall in a normal year?'),
+    tool('lump-sum-vs-dca', 'Should a bonus go in at once or bit by bit?'),
   ]),
-  stage('Growing your portfolio', 'Check what you really hold before adding risk.', [
+  stage('Shape your portfolio', 'Decide how much risk to carry, and check what you really hold before adding more.', [
+    calc('allocation', 'How much should be in stocks, if CPF counts as my bonds?'),
     tool('concentration', 'Am I more concentrated in a few companies than I think?'),
     tool('snp1', 'Does holding only the largest US company beat the index?'),
     tool('leveraged-etf', 'What does a 3x fund do over years?'),
   ]),
-  stage('Planning to stop work', 'Find the number you need and the years left to reach it.', [
+  stage('Plan to stop work', 'Find the number you need and the years left to reach it.', [
     calc('financial-independence', 'How big a pot do I need to live off?'),
     tool('fire-cpf', 'Can my savings carry me to 55, when CPF opens up?'),
   ]),

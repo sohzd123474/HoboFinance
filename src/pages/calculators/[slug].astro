@@ -8,7 +8,7 @@ export function getStaticPaths() {
 }
 
 const calc = calculators.find((c) => c.slug === Astro.params.slug)!;
-const unitLabel = { money: '', percent: '%', years: 'years', count: 'a year' } as const;
+const unitLabel = { money: '', percent: '%', years: 'years', count: 'a year', plain: '' } as const;
 const chipLabel = (n: number, unit: string) =>
   unit === 'percent'
     ? `${n}%`
@@ -52,7 +52,7 @@ const chipLabel = (n: number, unit: string) =>
                 step={f.step}
                 aria-describedby={`e-${f.id}${f.hint ? ` h-${f.id}` : ''}`}
               />
-              {f.unit !== 'money' && (
+              {f.unit !== 'money' && f.unit !== 'plain' && (
                 <span class="unit" aria-hidden="true">
                   {unitLabel[f.unit]}
                 </span>
@@ -97,6 +97,12 @@ const chipLabel = (n: number, unit: string) =>
       </figcaption>
       <div data-out="chart"></div>
       <p class="chart-tip num" data-out="tip">Hover or tap a bar to see that year.</p>
+      <details class="breakdown">
+        <summary>Show the figures for every year</summary>
+        <div class="table-scroll">
+          <table class="data" data-out="table"></table>
+        </div>
+      </details>
     </figure>
   </div>
 
@@ -219,6 +225,19 @@ const chipLabel = (n: number, unit: string) =>
   }
   .chart[hidden] {
     display: none;
+  }
+  .breakdown {
+    margin-top: 0.75rem;
+  }
+  .breakdown summary {
+    cursor: pointer;
+    font-weight: 600;
+    padding-block: 0.4rem;
+  }
+  .breakdown .table-scroll {
+    margin-top: 0.5rem;
+    max-height: 24rem;
+    overflow-y: auto;
   }
   .result-rows :global(dt) {
     color: var(--ink-soft);
@@ -373,6 +392,13 @@ const chipLabel = (n: number, unit: string) =>
       legend.length > 1 ? legend.map((l, i) => `<span><i style="background:${COLORS[i]}"></i>${esc(l)}</span>`).join('') : '';
     out('chart-title').textContent = legend.length > 1 ? 'Year by year' : `${legend[0]}, year by year`;
     tip.textContent = 'Hover or tap a bar to see that year.';
+    const two = legend.length > 1;
+    out('table').innerHTML =
+      `<thead><tr><th>Year</th><th>${esc(legend[0])}</th>${two ? `<th>${esc(legend[1])}</th><th>Total</th>` : ''}</tr></thead><tbody>` +
+      series
+        .map((p) => `<tr><td>${p.year}</td><td>${money(p.base)}</td>${two ? `<td>${money(p.extra)}</td><td>${money(p.base + p.extra)}</td>` : ''}</tr>`)
+        .join('') +
+      '</tbody>';
     chart.querySelectorAll<SVGGElement>('.bar').forEach((g) => {
       const set = () => (tip.textContent = g.dataset.tip!);
       g.addEventListener('pointerenter', set);

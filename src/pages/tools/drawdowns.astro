@@ -1,0 +1,16 @@
+---
+import Base from '../../layouts/Base.astro';
+import Drawdowns from '../../components/staying/Drawdowns.tsx';
+---
+
+<Base title="Falls within a year" description="How far the S&P 500 and other markets fell at some point in each year, and how often those years still ended higher.">
+  <div class="wrap page-head">
+    <h1>Falls within a year</h1>
+    <p class="lede">Most years include a fall that feels alarming at the time. See how large they were and how those years ended.</p>
+  </div>
+  <div class="wrap">
+    <Drawdowns client:only="react">
+      <p slot="fallback" style="margin-top:2rem">Loading daily prices…</p>
+    </Drawdowns>
+  </div>
+</Base>

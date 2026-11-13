@@ -639,3 +639,27 @@ table.data th.wrap-cell {
 .next-step p:first-child {
   font-size: var(--step-1);
 }
+
+/* Phone widths: nothing may push the page wider than the screen. */
+.panel {
+  min-width: 0;
+  overflow-x: auto;
+}
+.tool,
+.tool > section,
+.controls > div {
+  min-width: 0;
+}
+@media (max-width: 34rem) {
+  table.data td.wrap-cell,
+  table.data th.wrap-cell {
+    min-width: 9rem;
+  }
+  table.data th,
+  table.data td {
+    padding: 0.45rem 0.5rem;
+  }
+  .chart-box {
+    height: 17rem;
+  }
+}

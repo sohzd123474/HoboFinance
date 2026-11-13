@@ -414,7 +414,34 @@ export default function Explorer() {
                 </LineChart>
               </ResponsiveContainer>
             </div>
-            <p className="note">Value in USD, including the money paid in each month. SPY is the dashed line.</p>
+            <p className="note">Value in USD, including the money paid in each month. SPY is the dashed line. Hover or tap the chart for any month.</p>
+            <details>
+              <summary style={{ cursor: 'pointer', fontWeight: 600, padding: '0.4rem 0' }}>Show the value at the end of every year</summary>
+              <div className="table-scroll" style={{ maxHeight: '24rem', overflowY: 'auto', marginTop: '0.5rem' }}>
+                <table className="data">
+                  <thead>
+                    <tr>
+                      <th>End of</th>
+                      {okShown.map((v) => (
+                        <th key={v.id}>{v.name}</th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {chartRows
+                      .filter((r, i) => String(r.date).endsWith('-12') || i === chartRows.length - 1)
+                      .map((r) => (
+                        <tr key={String(r.date)}>
+                          <td>{monthName(String(r.date))}</td>
+                          {okShown.map((v) => (
+                            <td key={v.id}>{usd(Number(r[v.id]))}</td>
+                          ))}
+                        </tr>
+                      ))}
+                  </tbody>
+                </table>
+              </div>
+            </details>
           </div>
         )}
       </section>

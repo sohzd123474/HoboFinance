@@ -193,7 +193,35 @@ export default function Leverage() {
             </LineChart>
           </ResponsiveContainer>
         </div>
-        <p className="note">Growth of 1 on a log scale, so equal distances are equal percentage moves.</p>
+        <p className="note">Growth of 1 on a log scale, so equal distances are equal percentage moves. Hover or tap the chart for any date.</p>
+        <details>
+          <summary style={{ cursor: 'pointer', fontWeight: 600, padding: '0.4rem 0' }}>Show the figures at the end of every year</summary>
+          <div className="table-scroll" style={{ maxHeight: '24rem', overflowY: 'auto', marginTop: '0.5rem' }}>
+            <table className="data">
+              <thead>
+                <tr>
+                  <th>End of</th>
+                  <th>{INDEX}</th>
+                  <th>{o.leverage}x simulated</th>
+                  {real && <th>{PRODUCT}</th>}
+                </tr>
+              </thead>
+              <tbody>
+                {index.dates
+                  .map((d, i) => ({ d, i }))
+                  .filter(({ d, i }) => i === index.dates.length - 1 || d.slice(0, 4) !== index.dates[i + 1].slice(0, 4))
+                  .map(({ d, i }) => (
+                    <tr key={d}>
+                      <td>{d.slice(0, 4)}</td>
+                      <td>{times(index.values[i])}</td>
+                      <td>{times(sim.values[i])}</td>
+                      {real && <td>{realByDate?.has(d) ? times(realByDate.get(d)!) : 'n/a'}</td>}
+                    </tr>
+                  ))}
+              </tbody>
+            </table>
+          </div>
+        </details>
       </section>
 
       <section>

@@ -123,3 +123,15 @@ export function fire(
   }
   return { target, years: months === null ? null : months / 12, series: months === null ? [] : series };
 }
+
+/** Years of monthly saving until a balance reaches a target; null if not within 100 years. */
+export function yearsToTarget(start: number, monthly: number, annualRatePct: number, target: number): number | null {
+  if (start >= target) return 0;
+  const r = annualRatePct / 100 / 12;
+  let balance = start;
+  for (let m = 1; m <= 1200; m++) {
+    balance = balance * (1 + r) + monthly;
+    if (balance >= target) return m / 12;
+  }
+  return null;
+}

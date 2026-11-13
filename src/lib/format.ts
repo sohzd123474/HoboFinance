@@ -30,7 +30,7 @@ export function money(n: number): string {
     currency: getCurrency(),
     currencyDisplay: 'narrowSymbol',
     // Small amounts keep their cents; large ones are rounded to whole units.
-    maximumFractionDigits: Math.abs(n) < 100 ? 2 : 0,
+    maximumFractionDigits: Math.abs(n) < 100 && !Number.isInteger(n) ? 2 : 0,
   }).format(n);
 }
 

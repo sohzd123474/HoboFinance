@@ -1,0 +1,16 @@
+---
+import Base from '../../layouts/Base.astro';
+import LumpSum from '../../components/staying/LumpSum.tsx';
+---
+
+<Base title="Lump sum or spread it out" description="Investing a sum all at once against feeding it in over several months, tested on S&P 500 prices since 1999.">
+  <div class="wrap page-head">
+    <h1>Lump sum or spread it out</h1>
+    <p class="lede">You have a bonus or savings to invest. Does it matter whether it goes in at once or over several months?</p>
+  </div>
+  <div class="wrap">
+    <LumpSum client:only="react">
+      <p slot="fallback" style="margin-top:2rem">Loading price data…</p>
+    </LumpSum>
+  </div>
+</Base>
