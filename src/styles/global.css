@@ -1,29 +1,29 @@
-/* Palette taken from old railway ticket stock: mint card, bottle-green ink,
-   signal yellow, and a boxcar oxide used only for warnings. */
+/* Palette: cool white paper, navy ink, blue links, with yellow kept for the
+   active state. Chart series avoid green. */
 :root {
   color-scheme: light;
-  --paper: #fafbf6;
-  --stock: #e1ebdb;
-  --rule: #b4c4b0;
-  --ink: #13241e;
-  --ink-soft: #46584f;
-  --link: #1d4b3c;
+  --paper: #fbfbfd;
+  --stock: #eef1f6;
+  --rule: #c9d0dc;
+  --ink: #141b2d;
+  --ink-soft: #4a5468;
+  --link: #1b46c2;
   --field: #ffffff;
-  --oxide: #9a3324;
-  /* Fixed in both themes: the green band and the yellow stub keep their own text colours. */
-  --green: #1d4b3c;
-  --on-green: #fafbf6;
+  --oxide: #b3261e;
+  /* Fixed in both themes: the dark band and the yellow marker keep their own text colours. */
+  --green: #141b2d;
+  --on-green: #fbfbfd;
   --signal: #f0bc2b;
-  --on-signal: #13241e;
+  --on-signal: #141b2d;
   /* Chart series, in the order they are assigned. */
-  --c1: #1d6b52;
+  --c1: #2456c8;
   --c2: #b97a06;
-  --c3: #9a3324;
-  --c4: #2a5fa8;
+  --c3: #b3261e;
+  --c4: #0e8aa8;
   --c5: #7a4fa3;
-  --c6: #0b7f7f;
+  --c6: #6b7280;
   --c7: #b0457a;
-  --c8: #5d6b2f;
+  --c8: #8a5a2b;
 
   --display: 'Big Shoulders Display Variable', 'Arial Narrow', sans-serif;
   --body: 'Atkinson Hyperlegible Next Variable', system-ui, sans-serif;
@@ -41,22 +41,22 @@
 
 :root[data-theme='dark'] {
   color-scheme: dark;
-  --paper: #0e1814;
-  --stock: #1a2a23;
-  --rule: #3a4d44;
-  --ink: #e8efe6;
-  --ink-soft: #a9b9ae;
-  --link: #8fd8b6;
-  --field: #0a120f;
-  --oxide: #f08a70;
-  --c1: #5fc9a3;
+  --paper: #0f1420;
+  --stock: #1a2132;
+  --rule: #343d52;
+  --ink: #e8ecf4;
+  --ink-soft: #a6b0c3;
+  --link: #8fb4ff;
+  --field: #0a0e17;
+  --oxide: #ff8a7a;
+  --c1: #7fb2f0;
   --c2: #f0bc2b;
   --c3: #f08a70;
-  --c4: #7fb2f0;
+  --c4: #5fd0e0;
   --c5: #c2a0ea;
-  --c6: #5fd0d0;
+  --c6: #aab3c2;
   --c7: #f092bd;
-  --c8: #b9cc7a;
+  --c8: #d6a36c;
 }
 
 *,
