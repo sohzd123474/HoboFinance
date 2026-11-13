@@ -1,6 +1,6 @@
 # Refresh the site's data
 
-Nothing on this site updates by itself. Prices, Savings Bonds rates and the hand-researched tables are all files in this repo, and they go stale until someone refreshes them.
+Only the Savings Bonds rates update by themselves: `.github/workflows/refresh-ssb.yml` fetches them from MAS every day and pushes when an issue is new or changed. Prices and the hand-researched tables are files in this repo, and they go stale until someone refreshes them.
 
 To refresh, open Claude Code in this folder and say: **"Follow REFRESH.md"**.
 
@@ -11,7 +11,7 @@ Work through the sections that are due, then run the checks and push. Report wha
 ### Every month (after the month has ended)
 
 1. **Prices.** Run `.venv\Scripts\python scripts/build_data.py`. It rewrites `public/data/monthly.json`, `daily.json` and `meta.json`. Read its output: any ticker listed as missing must be reported.
-2. **Savings Bonds.** Run `.venv\Scripts\python scripts/build_ssb.py`. It rewrites `public/data/ssb.json` from the MAS API. Confirm the newest issue month is present.
+2. **Savings Bonds.** Automated daily by the GitHub Action. Check that the newest issue month in `public/data/ssb.json` is this month or next. If it is older, look at the failed run under the repo's Actions tab, or run `.venv\Scripts\python scripts/build_ssb.py` by hand.
 3. **Largest US company.** Check which US company was largest by market value at the last month-end close (Slickcharts, companiesmarketcap.com). If it differs from the last entry in `NUMBER_ONE` in `src/data/rankings.ts`, add an entry with the check month, a source comment and a `confidence` flag. Then rerun step 1, because the script reads its tickers from that file.
 
 If `.venv` is missing, create it first:

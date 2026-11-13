@@ -1,0 +1,68 @@
+name: Refresh Savings Bonds data
+
+# Fetches the Savings Bonds rates from MAS every day and commits the data file
+# only when an issue was added or changed. The push to main deploys the site.
+on:
+  schedule:
+    - cron: '0 10 * * *' # 18:00 Singapore time, after MAS publishes
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: refresh-ssb
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+
+      - name: Fetch from MAS
+        run: |
+          pip install -r scripts/requirements-ssb.txt
+          python scripts/build_ssb.py
+
+      - name: See whether any issue changed
+        id: diff
+        run: |
+          # The file's build time changes on every run, so compare everything except that.
+          git show HEAD:public/data/ssb.json | jq -S 'del(.builtAt)' > /tmp/old.json
+          jq -S 'del(.builtAt)' public/data/ssb.json > /tmp/new.json
+          if cmp -s /tmp/old.json /tmp/new.json; then
+            echo "No new or changed issues."
+            git checkout -- public/data/ssb.json
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+            echo "newest=$(jq -r '.issues[-1].month' public/data/ssb.json)" >> "$GITHUB_OUTPUT"
+          fi
+
+      - uses: actions/setup-node@v5
+        if: steps.diff.outputs.changed == 'true'
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Test and build before publishing
+        if: steps.diff.outputs.changed == 'true'
+        run: |
+          npm ci
+          npm test
+          npm run build
+
+      - name: Commit and push
+        if: steps.diff.outputs.changed == 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add public/data/ssb.json
+          git commit -m "Refresh Savings Bonds data: newest issue ${{ steps.diff.outputs.newest }}"
+          git push
