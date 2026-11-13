@@ -1087,3 +1087,10 @@ table.data tbody tr:hover td {
     min-width: 5.5rem;
   }
 }
+
+/* A tool loads after the page. Holding a screen of space for it keeps the
+   footer from jumping down when it appears. */
+main astro-island {
+  display: block;
+  min-height: 100vh;
+}
