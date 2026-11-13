@@ -4,12 +4,31 @@ import { bySlug, type Calculator, type Field, type Figure } from '../../lib/calc
 import { money, years as yearsText } from '../../lib/format';
 import { readStored, sgd } from '../../lib/storage';
 import { earliestFire, fireTarget, milestones, simulate } from '../../lib/firecpf';
+import TaxDragSummary, { storageKey as taxdragKey } from '../taxdrag/Summary';
+import ParkingSummary, { storageKey as parkingKey } from '../parking/Summary';
+import SsbSummary, { storageKey as ssbKey } from '../ssb/Summary';
+import IlpSummary, { storageKey as ilpKey } from '../ilp/Summary';
+import ConcentrationSummary, { storageKey as concentrationKey } from '../concentration/Summary';
+import { DrawdownsSummary, LeverageSummary, LumpSumSummary, Snp1Summary } from './ToolSummaries';
 import { ageText, defaultPlan, normalise, startAges, thisMonth, toInputs, type PlanState } from '../firecpf/plan';
 
 // The report recomputes every calculator from the numbers saved in this
 // browser. Nothing is uploaded: "Save as PDF" uses the browser's own print
 // dialog. Pages the visitor has not filled in use the starting examples and
 // are labelled as such.
+
+// Tools with a report summary: the path they live at, the key their inputs are saved under, and the summary.
+const TOOL_SUMMARIES: Record<string, { key: string; Summary: () => React.ReactNode }> = {
+  '/tools/snp1/': { key: 'snp1', Summary: Snp1Summary },
+  '/tools/leveraged-etf/': { key: 'leverage', Summary: LeverageSummary },
+  '/tools/drawdowns/': { key: 'drawdowns', Summary: DrawdownsSummary },
+  '/tools/lump-sum-vs-dca/': { key: 'lumpsum', Summary: LumpSumSummary },
+  '/tools/ssb/': { key: ssbKey, Summary: SsbSummary },
+  '/tools/etf-tax-drag/': { key: taxdragKey, Summary: TaxDragSummary },
+  '/tools/parking/': { key: parkingKey, Summary: ParkingSummary },
+  '/tools/ilp-vs-diy/': { key: ilpKey, Summary: IlpSummary },
+  '/tools/concentration/': { key: concentrationKey, Summary: ConcentrationSummary },
+};
 
 const hasSaved = (key: string) => {
   try {
@@ -251,6 +270,8 @@ export default function Report() {
             }
             if (step.href === '/tools/fire-cpf/') return { kind: 'fire' as const, key: step.href, step, yours: hasSaved('firecpf') };
             if (step.href === '/report/') return null;
+            const t = TOOL_SUMMARIES[step.href];
+            if (t) return { kind: 'tool' as const, key: step.href, step, yours: hasSaved(t.key), Summary: t.Summary };
             return { kind: 'link' as const, key: step.href, step, yours: false };
           })
           .filter((x): x is NonNullable<typeof x> => x !== null),
@@ -307,6 +328,14 @@ export default function Report() {
                 <CalculatorSection key={i.key} calc={i.calc} question={i.step.question} yours={i.yours} />
               ) : i.kind === 'fire' ? (
                 <FireSection key={i.key} yours={i.yours} />
+              ) : i.kind === 'tool' ? (
+                <section key={i.key} className="report-section">
+                  <h3>
+                    {i.step.title} {!i.yours && <span className="tag-unsure">example figures</span>}
+                  </h3>
+                  <p className="note">{i.step.question}</p>
+                  <i.Summary />
+                </section>
               ) : (
                 <p key={i.key} className="note no-print">
                   {i.step.title} is not included in the report. <a href={i.step.href}>Open it</a> to see its figures.

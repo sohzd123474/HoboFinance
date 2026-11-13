@@ -3,35 +3,13 @@ import { MoneyInput } from '../MoneyInput';
 import { useMemo } from 'react';
 import { CartesianGrid, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import { CSPX_VS_SPYL, ESTATE_TAX, ETFS, RESEARCHED_ON, etfByTicker, type Etf, type Sourced } from '../../data/etfs';
-import { breakEvenSize, dragRate, project, yearlyCommission } from '../../lib/taxdrag';
 import { num, pct, sgd, useStored } from '../../lib/storage';
 import { Presets } from '../Presets';
+import { DEFAULTS, DEFAULT_A, compute, storageKey, toPct, type State } from './state';
 
-// Fractions in the data file become percentages in the inputs.
-const toPct = (fraction: number) => Math.round(fraction * 1e6) / 1e4;
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 const day = (iso: string) => `${Number(iso.slice(8, 10))} ${MONTHS[Number(iso.slice(5, 7)) - 1]} ${iso.slice(0, 4)}`;
 const whole = (n: number) => n.toLocaleString('en-SG');
-
-const DEFAULT_A = etfByTicker('VOO') ?? ETFS[0];
-const DEFAULT_B = etfByTicker('CSPX') ?? ETFS[1];
-
-const DEFAULTS = {
-  size: 100000,
-  added: 12000,
-  grossReturn: 7,
-  dividendYield: toPct(DEFAULT_A.dividendYield ?? 0),
-  years: 30,
-  commission: 0,
-  orders: 12,
-  fundA: DEFAULT_A.ticker,
-  erA: toPct(DEFAULT_A.expenseRatio),
-  whtA: toPct(DEFAULT_A.withholding),
-  fundB: DEFAULT_B.ticker,
-  erB: toPct(DEFAULT_B.expenseRatio),
-  whtB: toPct(DEFAULT_B.withholding),
-};
-type State = typeof DEFAULTS;
 
 function Unverified({ etf }: { etf: Etf }) {
   if (etf.verified) return null;
@@ -54,11 +32,9 @@ function SourceLink<T>({ s }: { s: Sourced<T> }) {
 }
 
 export default function TaxDrag() {
-  const [o, setO] = useStored<State>('taxdrag', DEFAULTS);
+  const [o, setO] = useStored<State>(storageKey, DEFAULTS);
   const set = <K extends keyof State>(k: K, v: State[K]) => setO((prev) => ({ ...prev, [k]: v }));
 
-  const etfA = etfByTicker(o.fundA) ?? DEFAULT_A;
-  const etfB = etfByTicker(o.fundB) ?? DEFAULT_B;
   const pickFund = (slot: 'A' | 'B', ticker: string) => {
     const e = etfByTicker(ticker);
     if (!e) return;
@@ -69,29 +45,10 @@ export default function TaxDrag() {
     );
   };
 
-  const years = Math.min(60, Math.max(1, Math.round(o.years)));
-  const calc = useMemo(() => {
-    const y = o.dividendYield / 100;
-    const perYear = yearlyCommission(o.commission, o.orders, o.added);
-    const make = (etf: Etf, erPct: number, whtPct: number) => {
-      const feeRate = erPct / 100;
-      const taxRate = dragRate(0, y, whtPct / 100);
-      const drag = dragRate(feeRate, y, whtPct / 100);
-      const commission = etf.domicile === 'IE' ? perYear : 0;
-      const rows = project({ start: o.size, yearlyAdded: o.added, grossReturn: o.grossReturn / 100, drag, years, yearlyCost: commission });
-      return { etf, feeRate, taxRate, drag, commission, rows, ending: rows[rows.length - 1].value };
-    };
-    return { a: make(etfA, o.erA, o.whtA), b: make(etfB, o.erB, o.whtB), perYear };
-  }, [o, etfA, etfB, years]);
-
-  const { a, b } = calc;
-  const irish = a.etf.domicile === 'IE' && b.etf.domicile !== 'IE' ? a : b.etf.domicile === 'IE' && a.etf.domicile !== 'IE' ? b : null;
-  const other = irish === a ? b : a;
-  const breakEven = irish ? breakEvenSize(other.drag, irish.drag, calc.perYear) : null;
+  const calc = useMemo(() => compute(o), [o]);
+  const { etfA, etfB, years, a, b, irish, other, breakEven, nameA, nameB } = calc;
 
   const chartRows = a.rows.map((r, i) => ({ year: r.year, a: Math.round(r.value), b: Math.round(b.rows[i].value) }));
-  const nameA = a.etf.ticker;
-  const nameB = a.etf.ticker === b.etf.ticker ? `${b.etf.ticker} (second)` : b.etf.ticker;
 
   const fundControls = (slot: 'A' | 'B') => {
     const etf = slot === 'A' ? etfA : etfB;

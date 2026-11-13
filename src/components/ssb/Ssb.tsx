@@ -11,7 +11,6 @@ import {
   breakEvenSimpleRate,
   breakEvenTable,
   change,
-  clampYears,
   compare,
   simpleAverage,
   tenYearAverage,
@@ -19,16 +18,7 @@ import {
   type SsbData,
 } from '../../lib/ssb';
 import { num, sgd, useJson, useStored } from '../../lib/storage';
-
-const DEFAULTS = {
-  amount: 10000,
-  years: 10,
-  oaRate: 2.5,
-  /** null means "same as the OA rate" until the reader sets one. */
-  reinvestRate: null as number | null,
-  /** Issue code; empty means the latest issue. */
-  issue: '',
-};
+import { DEFAULTS, STORAGE_KEY, dayName, monthName, plain, points, rate, resolveInputs, years } from './state';
 
 // Facts read from the pages linked below on this date. They are not part of the calculations,
 // except the holding limit, which only triggers a warning.
@@ -107,29 +97,12 @@ const LEFT_OUT: LeftOut[] = [
   },
 ];
 
-const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-const monthName = (ym: string) => `${MONTHS[Number(ym.slice(5, 7)) - 1]} ${ym.slice(0, 4)}`;
-const dayName = (iso: string) => `${Number(iso.slice(8, 10))} ${monthName(iso.slice(0, 7))}`;
-const rate = (n: number | null | undefined) => (n == null || !Number.isFinite(n) ? 'n/a' : `${n.toFixed(2)}%`);
-/** A change in percentage points, with its sign. */
-const points = (n: number | null) => {
-  if (n === null) return 'n/a';
-  const r = Math.round(n * 100) / 100;
-  return r === 0 ? 'No change' : `${r > 0 ? '+' : '−'}${Math.abs(r).toFixed(2)} pts`;
-};
-/** Trim a rate for use in a sentence: 2.5, not 2.50. */
-const plain = (n: number) => `${Number(n.toFixed(2))}%`;
-const years = (n: number) => `${n} ${n === 1 ? 'year' : 'years'}`;
-
 export default function Ssb() {
   const { data, error } = useJson<SsbData>('/data/ssb.json');
-  const [o, setO] = useStored('ssb', DEFAULTS);
+  const [o, setO] = useStored(STORAGE_KEY, DEFAULTS);
   const set = <K extends keyof typeof DEFAULTS>(k: K, v: (typeof DEFAULTS)[K]) => setO((prev) => ({ ...prev, [k]: v }));
 
-  const oaRate = Number.isFinite(o.oaRate) ? o.oaRate : DEFAULTS.oaRate;
-  const reinvestRate = o.reinvestRate ?? oaRate;
-  const holdYears = clampYears(o.years);
-  const amount = Number.isFinite(o.amount) && o.amount > 0 ? o.amount : 0;
+  const { oaRate, reinvestRate, holdYears, amount } = resolveInputs(o);
 
   // One row per issue, oldest first, with everything the tables and chart need.
   const rows = useMemo(() => {

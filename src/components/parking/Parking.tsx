@@ -1,35 +1,12 @@
 import { PercentInput } from '../PercentInput';
 import { MoneyInput } from '../MoneyInput';
-import { MAX_MONTHS, MIN_MONTHS, clampMonths, parkingResult, type InterestMethod } from '../../lib/parking';
+import { MAX_MONTHS, MIN_MONTHS } from '../../lib/parking';
 import { num, sgd, useStored } from '../../lib/storage';
 import { Presets } from '../Presets';
+import { DEFAULTS, METHOD_NAME, PLACEHOLDER_RATE, compute, storageKey, type Option } from './state';
 
 const MAS_SSB = 'https://www.mas.gov.sg/bonds-and-bills/singapore-savings-bonds';
 const MAS_TBILL = 'https://www.mas.gov.sg/bonds-and-bills/singapore-government-t-bills-information-for-individuals';
-
-// A neutral starting rate, not a quote. The note under the inputs tells the reader to replace it.
-const PLACEHOLDER_RATE = 3.0;
-
-interface Option {
-  label: string;
-  rate: number;
-  method: InterestMethod;
-}
-
-const DEFAULTS: { amount: number; months: number; options: Option[] } = {
-  amount: 10000,
-  months: 12,
-  options: [
-    { label: 'Savings Bonds', rate: PLACEHOLDER_RATE, method: 'monthly' },
-    { label: '6-month T-bill', rate: PLACEHOLDER_RATE, method: 'simple' },
-    { label: 'Money market fund', rate: PLACEHOLDER_RATE, method: 'monthly' },
-  ],
-};
-
-const METHOD_NAME: Record<InterestMethod, string> = {
-  simple: 'Simple (not compounded)',
-  monthly: 'Compounded monthly',
-};
 
 const BOOKS = [
   {
@@ -59,14 +36,10 @@ const TOOLS = [
 ];
 
 export default function Parking() {
-  const [o, setO] = useStored('parking', DEFAULTS);
-  // Guard against saved data in an older shape.
-  const options: Option[] = DEFAULTS.options.map((d, i) => ({ ...d, ...(Array.isArray(o.options) ? o.options[i] : undefined) }));
+  const [o, setO] = useStored(storageKey, DEFAULTS);
+  const { options, months, results } = compute(o);
   const setOption = (i: number, patch: Partial<Option>) =>
     setO((prev) => ({ ...prev, options: options.map((x, k) => (k === i ? { ...x, ...patch } : x)) }));
-
-  const months = clampMonths(o.months);
-  const results = options.map((x) => ({ ...x, ...parkingResult(o.amount, x.rate, months, x.method) }));
 
   return (
     <div className="tool">

@@ -5,7 +5,7 @@ import { assetPath, leveragedPath, pathStats, type Path } from '../../lib/levera
 import { pct, num, useJson, useStored } from '../../lib/storage';
 import { Presets } from '../Presets';
 
-const DEFAULTS = { start: '2010-02-11', end: '', leverage: 3, cost: 0.95 };
+export const DEFAULTS = { start: '2010-02-11', end: '', leverage: 3, cost: 0.95 };
 const INDEX = 'QQQ';
 const PRODUCT = 'TQQQ';
 

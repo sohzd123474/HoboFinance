@@ -4,32 +4,16 @@ import { Presets } from '../Presets';
 import { DEFAULT_US_SHARE_PCT, SP500_FUNDS, SP500_TOP, SP500_TOP_AS_OF, SP500_TOP_SOURCES, WORLD_FUNDS } from '../../data/sp500-top';
 import {
   VERDICT_THRESHOLD,
-  applyDca,
   effectiveHoldings,
   findConstituent,
   hhi,
-  lookThrough,
-  parseHoldings,
-  redundantDca,
-  summarisePositions,
   verdict,
-  type FundConfig,
   type ParseError,
 } from '../../lib/concentration';
 import { num, pct, useStored } from '../../lib/storage';
+import { DCA_MONTHS, DEFAULTS, STORAGE_KEY, compute, type State } from './state';
 
-const DCA_MONTHS = 12;
 const CHART_ROWS = 10;
-
-// Placeholder example, not anyone's real portfolio. D05 is DBS on the Singapore exchange.
-const DEFAULTS = {
-  holdingsText: 'CSPX 30000\nAAPL 5000\nNVDA 4000\nD05 6000',
-  dcaText: 'CSPX 1000\nNVDA 300\nAAPL 200',
-  spFunds: SP500_FUNDS,
-  worldFunds: WORLD_FUNDS.map((f) => f.ticker),
-  usShare: Object.fromEntries(WORLD_FUNDS.map((f) => [f.ticker, f.usSharePct])) as Record<string, number>,
-};
-type State = typeof DEFAULTS;
 
 const amount = (n: number) => n.toLocaleString('en-SG', { maximumFractionDigits: 0 });
 const eff = (n: number | null) => (n === null ? 'n/a' : n.toFixed(1));
@@ -55,29 +39,10 @@ function Errors({ what, errors }: { what: string; errors: ParseError[] }) {
 }
 
 export default function Concentration() {
-  const [o, setO] = useStored<State>('concentration', DEFAULTS);
+  const [o, setO] = useStored<State>(STORAGE_KEY, DEFAULTS);
   const set = <K extends keyof State>(k: K, v: State[K]) => setO((prev) => ({ ...prev, [k]: v }));
 
-  const calc = useMemo(() => {
-    const held = parseHoldings(o.holdingsText);
-    const dca = parseHoldings(o.dcaText);
-    const cfg: FundConfig = {
-      spFunds: o.spFunds,
-      worldFunds: Object.fromEntries(o.worldFunds.map((t) => [t, o.usShare[t] ?? DEFAULT_US_SHARE_PCT])),
-      constituents: SP500_TOP,
-    };
-    const after = applyDca(held.rows, dca.rows, DCA_MONTHS);
-    return {
-      held,
-      dca,
-      cfg,
-      now: summarisePositions(held.rows),
-      later: summarisePositions(after),
-      ltNow: lookThrough(held.rows, cfg),
-      ltLater: lookThrough(after, cfg),
-      redundant: redundantDca(held.rows, dca.rows, cfg),
-    };
-  }, [o.holdingsText, o.dcaText, o.spFunds, o.worldFunds, o.usShare]);
+  const calc = useMemo(() => compute(o), [o.holdingsText, o.dcaText, o.spFunds, o.worldFunds, o.usShare]);
 
   const { held, dca, now, later, ltNow, ltLater, redundant } = calc;
   // Tickers the user has typed that could be funds: everything that is not a listed company.

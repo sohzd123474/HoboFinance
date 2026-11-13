@@ -39,7 +39,7 @@ const TICKER_COLORS = ['var(--c1)', 'var(--c4)', 'var(--c3)', 'var(--c5)', 'var(
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 const monthName = (ym: string) => `${MONTHS[Number(ym.slice(5, 7)) - 1]} ${ym.slice(0, 4)}`;
 
-const DEFAULTS = {
+export const DEFAULTS = {
   start: '2000-01',
   end: '',
   monthly: 1000,

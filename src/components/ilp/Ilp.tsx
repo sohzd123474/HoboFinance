@@ -4,52 +4,22 @@ import { useMemo } from 'react';
 import { CartesianGrid, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import { Presets, type Preset } from '../Presets';
 import {
-  ILP_DEFAULTS,
   ILP_DEFAULT_NOTES,
   RESEARCHED_ON,
   WELCOME_BONUS_BANDS,
   WELCOME_BONUS_TABLE,
   WELCOME_BONUS_YEARS,
   simulateIlp,
-  welcomeBonusRate,
-  type IlpParams,
 } from '../../lib/ilp';
+import { DEFAULTS, STORAGE_KEY, YEARS, toParams, type State, type Tab } from './state';
 import { num, pct, sgd, useStored } from '../../lib/storage';
 
-type Tab = 'chart' | 'table' | 'fees';
 const TABS: { id: Tab; label: string }[] = [
   { id: 'chart', label: 'Chart' },
   { id: 'table', label: 'Yearly table' },
   { id: 'fees', label: 'Fee breakdown' },
 ];
 const IIP_CHOICES = Object.keys(WELCOME_BONUS_TABLE).map(Number);
-const YEARS = 30;
-
-const DEFAULTS = {
-  basePremium: 6000,
-  monthlyTopUp: 0,
-  iipYears: 20,
-  keepPaying: false,
-  grossReturnPct: 6,
-  ilpFundFeePct: ILP_DEFAULTS.ilpFundFeePct as number,
-  suppChargePct: ILP_DEFAULTS.suppChargePct as number,
-  suppChargeYears: ILP_DEFAULTS.suppChargeYears as number,
-  suppOnTopUps: false,
-  topUpChargePct: ILP_DEFAULTS.topUpChargePct as number,
-  /** When true the welcome bonus follows the table for the chosen IIP and premium. */
-  bonusFromTable: true,
-  welcomeBonusPct: [0, 0, 0],
-  specialBonusFromYear: ILP_DEFAULTS.specialBonusFromYear as number,
-  specialBonusPct: ILP_DEFAULTS.specialBonusPct as number,
-  specialBonusLaterFromYear: ILP_DEFAULTS.specialBonusLaterFromYear as number,
-  specialBonusLaterPct: ILP_DEFAULTS.specialBonusLaterPct as number,
-  diyTerPct: ILP_DEFAULTS.diyTerPct as number,
-  diyCommission: ILP_DEFAULTS.diyCommission as number,
-  diyPurchasesPerYear: ILP_DEFAULTS.diyPurchasesPerYear as number,
-  tab: 'chart' as Tab,
-};
-type State = typeof DEFAULTS;
-
 const pctLabel = (v: number): Preset => ({ label: `${v}%`, value: v });
 const money = (v: number): Preset => ({ label: v.toLocaleString('en-SG'), value: v });
 
@@ -107,34 +77,10 @@ function Field({
 }
 
 export default function Ilp() {
-  const [o, setO] = useStored<State>('ilp', DEFAULTS);
+  const [o, setO] = useStored<State>(STORAGE_KEY, DEFAULTS);
   const set = <K extends keyof State>(k: K, v: State[K]) => setO((prev) => ({ ...prev, [k]: v }));
 
-  const tableRate = welcomeBonusRate(o.iipYears, o.basePremium);
-  const manual = Array.from({ length: WELCOME_BONUS_YEARS }, (_, i) => o.welcomeBonusPct[i] ?? 0);
-  const welcome = o.bonusFromTable ? Array.from({ length: WELCOME_BONUS_YEARS }, () => tableRate ?? 0) : manual;
-
-  const params: IlpParams = {
-    basePremium: o.basePremium,
-    monthlyTopUp: o.monthlyTopUp,
-    iipYears: o.iipYears,
-    keepPaying: o.keepPaying,
-    years: YEARS,
-    grossReturnPct: o.grossReturnPct,
-    ilpFundFeePct: o.ilpFundFeePct,
-    suppChargePct: o.suppChargePct,
-    suppChargeYears: o.suppChargeYears,
-    suppOnTopUps: o.suppOnTopUps,
-    topUpChargePct: o.topUpChargePct,
-    welcomeBonusPct: welcome,
-    specialBonusFromYear: o.specialBonusFromYear,
-    specialBonusPct: o.specialBonusPct,
-    specialBonusLaterFromYear: o.specialBonusLaterFromYear,
-    specialBonusLaterPct: o.specialBonusLaterPct,
-    diyTerPct: o.diyTerPct,
-    diyCommission: o.diyCommission,
-    diyPurchasesPerYear: o.diyPurchasesPerYear,
-  };
+  const { params, tableRate, manual } = toParams(o);
   const key = JSON.stringify(params);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const r = useMemo(() => simulateIlp(params), [key]);
