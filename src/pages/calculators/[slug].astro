@@ -1,0 +1,366 @@
+---
+import Base from '../../layouts/Base.astro';
+import { calculators } from '../../lib/calculators';
+
+export function getStaticPaths() {
+  return calculators.map((c) => ({ params: { slug: c.slug } }));
+}
+
+const calc = calculators.find((c) => c.slug === Astro.params.slug)!;
+const unitLabel = { money: '', percent: '%', years: 'years' } as const;
+---
+
+<Base title={`${calc.title} calculator`} description={calc.blurb}>
+  <div class="wrap page-head">
+    <h1>{calc.title}</h1>
+    <p class="lede">{calc.blurb}</p>
+  </div>
+
+  <div class="wrap calc" data-calc={calc.slug}>
+    <form class="inputs" onsubmit="return false">
+      {
+        calc.fields.map((f) => (
+          <div class="field">
+            <label for={`f-${f.id}`}>{f.label}</label>
+            <div class="control">
+              {f.unit === 'money' && (
+                <span class="unit" data-symbol aria-hidden="true">
+                  $
+                </span>
+              )}
+              <input
+                id={`f-${f.id}`}
+                name={f.id}
+                type="number"
+                inputmode="decimal"
+                value={f.value}
+                min={f.min}
+                max={f.max}
+                step={f.step}
+                aria-describedby={`e-${f.id}${f.hint ? ` h-${f.id}` : ''}`}
+              />
+              {f.unit !== 'money' && (
+                <span class="unit" aria-hidden="true">
+                  {unitLabel[f.unit]}
+                </span>
+              )}
+            </div>
+            {f.hint && (
+              <p class="hint" id={`h-${f.id}`}>
+                {f.hint}
+              </p>
+            )}
+            <p class="error" id={`e-${f.id}`} hidden />
+          </div>
+        ))
+      }
+    </form>
+
+    <div class="result" aria-live="polite">
+      <div class="result-top">
+        <p class="result-label" data-out="headline-label"></p>
+        <p class="result-big num" data-out="headline"></p>
+      </div>
+      <dl class="result-rows" data-out="rows"></dl>
+      <p class="result-note" data-out="note" hidden></p>
+    </div>
+
+    <figure class="chart">
+      <figcaption>
+        <span data-out="chart-title">Year by year</span>
+        <span class="legend" data-out="legend"></span>
+      </figcaption>
+      <div data-out="chart"></div>
+      <p class="chart-tip num" data-out="tip">Hover or tap a bar to see that year.</p>
+    </figure>
+  </div>
+
+  <section class="wrap">
+    <h2>How this is worked out</h2>
+    <div class="prose">
+      {calc.explain.map((p) => <p>{p}</p>)}
+    </div>
+  </section>
+</Base>
+
+<style>
+  .calc {
+    display: grid;
+    grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
+    gap: 2rem 2.5rem;
+    align-items: start;
+    margin-top: 2.25rem;
+  }
+  @media (max-width: 46rem) {
+    .calc {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+  .inputs {
+    display: grid;
+    gap: 1.1rem;
+  }
+  .field label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 0.3rem;
+  }
+  .control {
+    display: flex;
+    align-items: stretch;
+    border: 1.5px solid var(--ink);
+    border-radius: 3px;
+    background: #fff;
+  }
+  .control:focus-within {
+    outline: 3px solid var(--signal);
+    outline-offset: 2px;
+    box-shadow: 0 0 0 5px var(--ink);
+  }
+  .control input {
+    flex: 1;
+    min-width: 0;
+    font: inherit;
+    font-size: var(--step-1);
+    font-variant-numeric: tabular-nums;
+    color: var(--ink);
+    border: 0;
+    background: transparent;
+    padding: 0.5rem 0.7rem;
+    min-height: 3rem;
+  }
+  .control input:focus-visible {
+    outline: none;
+    box-shadow: none;
+  }
+  .unit {
+    display: grid;
+    place-items: center;
+    min-width: 2.75rem;
+    padding-inline: 0.7rem;
+    background: var(--stock);
+    color: var(--ink-soft);
+    font-weight: 600;
+  }
+  .unit:first-child {
+    border-right: 1.5px solid var(--ink);
+  }
+  .unit:last-child {
+    border-left: 1.5px solid var(--ink);
+  }
+  .hint,
+  .error {
+    font-size: var(--step--1);
+    margin-top: 0.3rem;
+    color: var(--ink-soft);
+  }
+  .error {
+    color: var(--oxide);
+    font-weight: 600;
+  }
+
+  /* The answer is printed on a ticket: body above the perforation, breakdown below. */
+  .result {
+    background: var(--stock);
+    border: 1.5px solid var(--ink);
+    border-radius: 4px;
+  }
+  .result-top {
+    padding: 1.2rem 1.4rem 1.1rem;
+  }
+  .result-label {
+    font-weight: 600;
+  }
+  .result-big {
+    font-family: var(--display);
+    font-weight: 900;
+    font-size: clamp(2.8rem, 1.6rem + 5vw, 4.6rem);
+    line-height: 1;
+    margin-top: 0.15em;
+    overflow-wrap: anywhere;
+  }
+  .result-rows {
+    margin: 0;
+    padding: 0.9rem 1.4rem 1.1rem;
+    border-top: 2px dashed var(--ink);
+    display: grid;
+    gap: 0.45rem;
+  }
+  .result-rows :global(div) {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+  .result-rows :global(dt) {
+    color: var(--ink-soft);
+  }
+  .result-rows :global(dd) {
+    margin: 0;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    text-align: right;
+  }
+  .result-note {
+    margin: 0;
+    padding: 0.8rem 1.4rem;
+    border-top: 1.5px solid var(--ink);
+    background: var(--signal);
+    border-radius: 0 0 2px 2px;
+  }
+
+  .chart {
+    grid-column: 1 / -1;
+    margin: 0;
+  }
+  .chart figcaption {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 0.4rem 1.5rem;
+    font-weight: 600;
+    margin-bottom: 0.6rem;
+  }
+  .legend {
+    display: flex;
+    gap: 1.1rem;
+    font-weight: 400;
+    font-size: var(--step--1);
+  }
+  .legend :global(i) {
+    display: inline-block;
+    width: 0.8em;
+    height: 0.8em;
+    margin-right: 0.4em;
+    border: 1.5px solid var(--ink);
+    vertical-align: -0.05em;
+  }
+  .chart :global(svg) {
+    display: block;
+    width: 100%;
+    height: auto;
+    overflow: visible;
+  }
+  .chart :global(.bar):hover :global(rect),
+  .chart :global(.bar):focus :global(rect) {
+    stroke-width: 2.5;
+  }
+  .chart :global(.bar):focus {
+    outline: none;
+  }
+  .chart-tip {
+    margin-top: 0.5rem;
+    font-size: var(--step--1);
+    color: var(--ink-soft);
+    min-height: 1.5em;
+  }
+</style>
+
+<script>
+  import { bySlug } from '../../lib/calculators';
+  import type { Figure } from '../../lib/calculators';
+  import { currencySymbol, money, years } from '../../lib/format';
+
+  const root = document.querySelector<HTMLElement>('[data-calc]')!;
+  const calc = bySlug(root.dataset.calc!)!;
+  const out = (name: string) => root.querySelector<HTMLElement>(`[data-out="${name}"]`)!;
+  const esc = (s: string) => s.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]!);
+
+  const show = (f: Figure) =>
+    f.kind === 'money' ? money(f.value as number) : f.kind === 'years' ? years(f.value as number) : String(f.value);
+
+  const COLORS = ['#1d4b3c', '#f0bc2b'];
+
+  function readValues(): Record<string, number> | null {
+    const values: Record<string, number> = {};
+    let ok = true;
+    for (const f of calc.fields) {
+      const input = root.querySelector<HTMLInputElement>(`#f-${f.id}`)!;
+      const error = root.querySelector<HTMLElement>(`#e-${f.id}`)!;
+      const n = parseFloat(input.value);
+      let message = '';
+      if (!Number.isFinite(n)) message = 'Enter a number.';
+      else if (n < f.min) message = `Enter ${f.min} or more.`;
+      else if (n > f.max) message = `Enter ${f.max} or less.`;
+      error.textContent = message;
+      error.hidden = !message;
+      input.setAttribute('aria-invalid', message ? 'true' : 'false');
+      if (message) ok = false;
+      values[f.id] = n;
+    }
+    return ok ? values : null;
+  }
+
+  function drawChart(series: { year: number; base: number; extra: number }[], legend: string[]) {
+    const chart = out('chart');
+    const tip = out('tip');
+    if (series.length === 0) {
+      chart.innerHTML = '';
+      tip.textContent = '';
+      return;
+    }
+    const W = 720;
+    const H = 240;
+    const padB = 22;
+    const max = Math.max(...series.map((p) => p.base + p.extra), 1);
+    const slot = W / series.length;
+    const bw = Math.max(2, Math.min(40, slot * 0.72));
+    const h = (v: number) => (v / max) * (H - padB - 4);
+    const labelEvery = Math.ceil(series.length / 10);
+
+    const bars = series
+      .map((p, i) => {
+        const x = i * slot + (slot - bw) / 2;
+        const hb = h(p.base);
+        const he = h(p.extra);
+        const base = H - padB;
+        const parts =
+          legend.length > 1
+            ? `${legend[0]} ${money(p.base)}, ${legend[1].toLowerCase()} ${money(p.extra)}, total ${money(p.base + p.extra)}`
+            : `${legend[0].toLowerCase()} ${money(p.base)}`;
+        const text = `Year ${p.year}: ${parts}`;
+        const label =
+          i % labelEvery === 0 || i === series.length - 1
+            ? `<text x="${x + bw / 2}" y="${H - 5}" text-anchor="middle" font-size="12" fill="#46584f">${p.year}</text>`
+            : '';
+        return `<g class="bar" tabindex="0" role="img" aria-label="${esc(text)}" data-tip="${esc(text)}">
+          <rect x="${i * slot}" y="0" width="${slot}" height="${H - padB}" fill="transparent" stroke="none"/>
+          <rect x="${x}" y="${base - hb}" width="${bw}" height="${hb}" fill="${COLORS[0]}" stroke="#13241e" stroke-width="1"/>
+          ${he > 0 ? `<rect x="${x}" y="${base - hb - he}" width="${bw}" height="${he}" fill="${COLORS[1]}" stroke="#13241e" stroke-width="1"/>` : ''}
+          ${label}
+        </g>`;
+      })
+      .join('');
+
+    chart.innerHTML = `<svg viewBox="0 0 ${W} ${H}" role="group" aria-label="Bar chart, one bar per year">
+      <line x1="0" x2="${W}" y1="${H - padB}" y2="${H - padB}" stroke="#13241e" stroke-width="1.5"/>${bars}</svg>`;
+
+    out('legend').innerHTML =
+      legend.length > 1 ? legend.map((l, i) => `<span><i style="background:${COLORS[i]}"></i>${esc(l)}</span>`).join('') : '';
+    out('chart-title').textContent = legend.length > 1 ? 'Year by year' : `${legend[0]}, year by year`;
+    tip.textContent = 'Hover or tap a bar to see that year.';
+    chart.querySelectorAll<SVGGElement>('.bar').forEach((g) => {
+      const set = () => (tip.textContent = g.dataset.tip!);
+      g.addEventListener('pointerenter', set);
+      g.addEventListener('focus', set);
+      g.addEventListener('click', set);
+    });
+  }
+
+  function update() {
+    root.querySelectorAll('[data-symbol]').forEach((el) => (el.textContent = currencySymbol()));
+    const values = readValues();
+    if (!values) return;
+    const r = calc.compute(values);
+    out('headline-label').textContent = r.headline.label;
+    out('headline').textContent = show(r.headline);
+    out('rows').innerHTML = r.rows.map((f) => `<div><dt>${esc(f.label)}</dt><dd>${esc(show(f))}</dd></div>`).join('');
+    const note = out('note');
+    note.textContent = r.note ?? '';
+    note.hidden = !r.note;
+    drawChart(r.series, r.legend);
+  }
+
+  root.querySelectorAll('input').forEach((el) => el.addEventListener('input', update));
+  document.addEventListener('hf-currency', update);
+  update();
+</script>

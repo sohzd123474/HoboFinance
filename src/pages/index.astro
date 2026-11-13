@@ -1,0 +1,180 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../layouts/Base.astro';
+import Tickets from '../components/Tickets.astro';
+
+const posts = (await getCollection('blog', (p) => !p.data.draft))
+  .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())
+  .slice(0, 3);
+const date = (d: Date) => d.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
+---
+
+<Base
+  title="Hobo Finance"
+  description="Free money calculators and plain-language guides to saving, borrowing and investing."
+>
+  <div class="hero">
+    <div class="wrap">
+      <h1>Small money, given time, gets big.</h1>
+      <form class="sentence" id="hero-calc" onsubmit="return false">
+        <p>
+          Set aside
+          <label>
+            <span class="sr">Amount per day</span>
+            <span class="sym" data-symbol>$</span><input id="h-daily" type="number" inputmode="decimal" value="5" min="0" max="10000" step="1" />
+          </label>
+          a day for
+          <label>
+            <span class="sr">Years</span>
+            <input id="h-years" type="number" inputmode="numeric" value="20" min="1" max="60" step="1" />
+          </label>
+          years, growing
+          <label>
+            <span class="sr">Growth per year, percent</span>
+            <input id="h-rate" type="number" inputmode="decimal" value="6" min="0" max="30" step="0.5" /><span class="sym">%</span>
+          </label>
+          a year, and you end up with
+        </p>
+        <output class="big num" id="h-total" for="h-daily h-years h-rate" aria-live="polite">$70,269</output>
+        <p class="split">
+          <span class="num" id="h-in">$36,500</span> is what you put in.
+          <span class="num" id="h-growth">$33,769</span> is growth.
+        </p>
+      </form>
+      <p class="hero-link"><a href="/calculators/compound-interest/">Open the full compound interest calculator</a></p>
+    </div>
+  </div>
+
+  <section class="wrap">
+    <h2>Calculators</h2>
+    <Tickets />
+  </section>
+
+  {
+    posts.length > 0 && (
+      <section class="wrap">
+        <h2>From the blog</h2>
+        <ul class="posts">
+          {posts.map((p) => (
+            <li>
+              <a href={`/blog/${p.id}/`}>{p.data.title}</a>
+              <p>{p.data.description}</p>
+              <time datetime={p.data.pubDate.toISOString()}>{date(p.data.pubDate)}</time>
+            </li>
+          ))}
+        </ul>
+        <p style="margin-top:1.25rem">
+          <a href="/blog/">All posts</a>
+        </p>
+      </section>
+    )
+  }
+</Base>
+
+<style>
+  .hero {
+    background: var(--green);
+    color: var(--paper);
+    padding-block: clamp(2.5rem, 7vw, 5rem) clamp(2.5rem, 6vw, 4rem);
+    border-bottom: 2px solid var(--ink);
+  }
+  .hero h1 {
+    max-width: 14ch;
+  }
+  .sentence {
+    margin-top: 2rem;
+    font-size: var(--step-1);
+    line-height: 2.1;
+    max-width: 40ch;
+  }
+  .sentence label {
+    white-space: nowrap;
+  }
+  .sentence input {
+    font: inherit;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    color: var(--signal);
+    background: transparent;
+    border: 0;
+    border-bottom: 3px solid var(--signal);
+    border-radius: 0;
+    width: 3.4em;
+    padding: 0 0.1em;
+    text-align: center;
+    -moz-appearance: textfield;
+    appearance: textfield;
+  }
+  .sentence input::-webkit-outer-spin-button,
+  .sentence input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+  .sentence input:focus-visible {
+    outline: 3px solid var(--paper);
+    box-shadow: none;
+  }
+  .sym {
+    color: var(--signal);
+    font-weight: 700;
+  }
+  .big {
+    display: block;
+    font-family: var(--display);
+    font-weight: 900;
+    font-size: clamp(3.6rem, 2rem + 9vw, 8rem);
+    line-height: 0.95;
+    color: var(--signal);
+    margin-block: 0.15em 0.1em;
+    overflow-wrap: anywhere;
+  }
+  .split {
+    font-size: var(--step-0);
+    line-height: 1.5;
+  }
+  .split .num {
+    font-weight: 700;
+  }
+  .hero-link {
+    margin-top: 1.5rem;
+  }
+  .hero-link a {
+    color: var(--paper);
+  }
+  .sr {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+</style>
+
+<script>
+  import { futureValue } from '../lib/finance';
+  import { currencySymbol, money } from '../lib/format';
+
+  const $ = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
+  const daily = $<HTMLInputElement>('h-daily');
+  const years = $<HTMLInputElement>('h-years');
+  const rate = $<HTMLInputElement>('h-rate');
+
+  const read = (el: HTMLInputElement) => {
+    const n = parseFloat(el.value);
+    if (!Number.isFinite(n)) return 0;
+    return Math.min(Number(el.max), Math.max(Number(el.min), n));
+  };
+
+  function update() {
+    const g = futureValue(0, (read(daily) * 365) / 12, read(rate), read(years));
+    $('h-total').textContent = money(g.balance);
+    $('h-in').textContent = money(g.contributed);
+    $('h-growth').textContent = money(g.interest);
+    document.querySelectorAll('[data-symbol]').forEach((el) => (el.textContent = currencySymbol()));
+  }
+
+  [daily, years, rate].forEach((el) => el.addEventListener('input', update));
+  document.addEventListener('hf-currency', update);
+  update();
+</script>

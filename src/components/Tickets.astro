@@ -1,0 +1,21 @@
+---
+import { calculators } from '../lib/calculators';
+---
+
+<ul class="tickets">
+  {
+    calculators.map((c) => (
+      <li>
+        <a class="ticket" href={`/calculators/${c.slug}/`}>
+          <span class="ticket-body">
+            <h3>{c.title}</h3>
+            <p>{c.blurb}</p>
+          </span>
+          <span class="ticket-stub" aria-hidden="true">
+            Open
+          </span>
+        </a>
+      </li>
+    ))
+  }
+</ul>

@@ -1,0 +1,72 @@
+---
+import '@fontsource-variable/big-shoulders-display/wght';
+import '@fontsource-variable/atkinson-hyperlegible-next/wght';
+import '../styles/global.css';
+import { CURRENCIES } from '../lib/format';
+
+interface Props {
+  title: string;
+  description: string;
+}
+const { title, description } = Astro.props;
+const path = Astro.url.pathname;
+const fullTitle = title === 'Hobo Finance' ? title : `${title} | Hobo Finance`;
+const canonical = new URL(path, Astro.site);
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={canonical} />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="theme-color" content="#1d4b3c" />
+  </head>
+  <body>
+    <header class="site-head">
+      <div class="wrap">
+        <a class="wordmark" href="/">Hobo Finance</a>
+        <nav aria-label="Main">
+          <a href="/calculators/" aria-current={path.startsWith('/calculators') ? 'page' : undefined}>Calculators</a>
+          <a href="/blog/" aria-current={path.startsWith('/blog') ? 'page' : undefined}>Blog</a>
+        </nav>
+        <label class="currency">
+          Currency
+          <select id="currency">
+            {CURRENCIES.map((c) => <option value={c}>{c}</option>)}
+          </select>
+        </label>
+      </div>
+    </header>
+
+    <main>
+      <slot />
+    </main>
+
+    <footer class="site-foot">
+      <div class="wrap flow">
+        <p>
+          Hobo Finance is free to use. The calculators give estimates from the numbers you enter; they are general
+          information, not financial advice. Check important decisions with a qualified adviser.
+        </p>
+        <p>Nothing you type into a calculator leaves your device.</p>
+      </div>
+    </footer>
+
+    <script>
+      import { getCurrency, setCurrency } from '../lib/format';
+      const select = document.querySelector<HTMLSelectElement>('#currency');
+      if (select) {
+        select.value = getCurrency();
+        select.addEventListener('change', () => setCurrency(select.value));
+      }
+    </script>
+  </body>
+</html>

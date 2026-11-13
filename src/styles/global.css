@@ -1,0 +1,313 @@
+/* Palette taken from old railway ticket stock: mint card, bottle-green ink,
+   signal yellow, and a boxcar oxide used only for warnings. */
+:root {
+  color-scheme: light;
+  --paper: #fafbf6;
+  --stock: #e1ebdb;
+  --rule: #b4c4b0;
+  --ink: #13241e;
+  --ink-soft: #46584f;
+  --green: #1d4b3c;
+  --signal: #f0bc2b;
+  --oxide: #9a3324;
+
+  --display: 'Big Shoulders Display Variable', 'Arial Narrow', sans-serif;
+  --body: 'Atkinson Hyperlegible Next Variable', system-ui, sans-serif;
+
+  --step--1: 0.889rem;
+  --step-0: 1.0625rem;
+  --step-1: 1.333rem;
+  --step-2: 1.777rem;
+  --step-3: 2.369rem;
+  --step-4: clamp(2.6rem, 1.6rem + 4.4vw, 4.6rem);
+
+  --gutter: clamp(1rem, 4vw, 2.5rem);
+  --measure: 66ch;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--body);
+  font-size: var(--step-0);
+  line-height: 1.55;
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--display);
+  font-weight: 800;
+  line-height: 1.02;
+  letter-spacing: 0.005em;
+  margin: 0;
+  text-wrap: balance;
+}
+h1 {
+  font-size: var(--step-4);
+}
+h2 {
+  font-size: var(--step-3);
+}
+h3 {
+  font-size: var(--step-2);
+}
+
+p {
+  margin: 0;
+  text-wrap: pretty;
+}
+
+a {
+  color: var(--green);
+  text-decoration-thickness: 0.09em;
+  text-underline-offset: 0.18em;
+}
+a:hover {
+  text-decoration-thickness: 0.16em;
+}
+
+:focus-visible {
+  outline: 3px solid var(--signal);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 5px var(--ink);
+}
+
+.wrap {
+  width: min(100% - 2 * var(--gutter), 68rem);
+  margin-inline: auto;
+}
+
+.flow > * + * {
+  margin-top: 1em;
+}
+
+.lede {
+  font-size: var(--step-1);
+  line-height: 1.4;
+  color: var(--ink-soft);
+  max-width: 46ch;
+}
+
+.num {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Header and footer */
+.site-head {
+  border-bottom: 2px solid var(--ink);
+  background: var(--paper);
+}
+.site-head .wrap {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 1.5rem;
+  padding-block: 0.75rem;
+}
+.wordmark {
+  font-family: var(--display);
+  font-weight: 900;
+  font-size: var(--step-2);
+  line-height: 1;
+  color: var(--ink);
+  text-decoration: none;
+  margin-right: auto;
+}
+.site-head nav {
+  display: flex;
+  gap: 1.25rem;
+}
+.site-head nav a {
+  color: var(--ink);
+  text-decoration: none;
+  font-weight: 600;
+  padding-block: 0.35rem;
+  border-bottom: 3px solid transparent;
+}
+.site-head nav a:hover,
+.site-head nav a[aria-current='page'] {
+  border-bottom-color: var(--signal);
+}
+.currency {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: var(--step--1);
+  color: var(--ink-soft);
+}
+.currency select {
+  font: inherit;
+  color: var(--ink);
+  background: var(--paper);
+  border: 1.5px solid var(--ink);
+  border-radius: 3px;
+  padding: 0.3rem 0.4rem;
+  min-height: 2.25rem;
+}
+
+.site-foot {
+  margin-top: 5rem;
+  border-top: 2px solid var(--ink);
+  padding-block: 1.75rem 2.5rem;
+  font-size: var(--step--1);
+  color: var(--ink-soft);
+}
+.site-foot p {
+  max-width: var(--measure);
+}
+
+main > section {
+  padding-block: 3.5rem 0;
+}
+.page-head {
+  padding-block: 3rem 0;
+}
+.page-head .lede {
+  margin-top: 1rem;
+}
+
+/* Tickets: the card form used for calculators */
+.tickets {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 19rem), 1fr));
+  gap: 1.25rem;
+  margin-top: 1.75rem;
+  padding: 0;
+  list-style: none;
+}
+.ticket {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  height: 100%;
+  background: var(--stock);
+  color: var(--ink);
+  text-decoration: none;
+  border: 1.5px solid var(--ink);
+  border-radius: 4px;
+}
+.ticket-body {
+  padding: 1.1rem 1.2rem 1.25rem;
+}
+.ticket-body h3 {
+  margin-bottom: 0.4rem;
+}
+.ticket-body p {
+  color: var(--ink-soft);
+  font-size: var(--step--1);
+  line-height: 1.45;
+}
+.ticket-stub {
+  display: grid;
+  place-items: center;
+  padding: 0 0.9rem;
+  border-left: 2px dashed var(--ink);
+  font-family: var(--display);
+  font-weight: 800;
+  font-size: var(--step-1);
+  writing-mode: vertical-rl;
+  background: var(--signal);
+  border-radius: 0 2px 2px 0;
+}
+.ticket:hover .ticket-stub {
+  background: var(--ink);
+  color: var(--signal);
+}
+
+/* Post lists */
+.posts {
+  list-style: none;
+  padding: 0;
+  margin: 1.5rem 0 0;
+  max-width: var(--measure);
+}
+.posts li {
+  padding-block: 1.1rem;
+  border-top: 1.5px solid var(--rule);
+}
+.posts li:last-child {
+  border-bottom: 1.5px solid var(--rule);
+}
+.posts a {
+  font-family: var(--display);
+  font-weight: 800;
+  font-size: var(--step-2);
+  line-height: 1.05;
+  color: var(--ink);
+  text-decoration: none;
+}
+.posts a:hover {
+  text-decoration: underline;
+  text-decoration-color: var(--signal);
+  text-decoration-thickness: 0.14em;
+}
+.posts p {
+  color: var(--ink-soft);
+  margin-top: 0.3rem;
+}
+.posts time,
+.post-date {
+  display: block;
+  font-size: var(--step--1);
+  color: var(--ink-soft);
+  margin-top: 0.3rem;
+}
+
+/* Article body */
+.prose {
+  max-width: var(--measure);
+  margin-top: 2rem;
+}
+.prose > * + * {
+  margin-top: 1.1em;
+}
+.prose h2 {
+  font-size: var(--step-2);
+  margin-top: 1.8em;
+}
+.prose h3 {
+  font-size: var(--step-1);
+  margin-top: 1.6em;
+}
+.prose ul,
+.prose ol {
+  padding-left: 1.2em;
+}
+.prose li + li {
+  margin-top: 0.4em;
+}
+.prose table {
+  border-collapse: collapse;
+  width: 100%;
+  font-variant-numeric: tabular-nums;
+}
+.prose th,
+.prose td {
+  text-align: right;
+  padding: 0.45rem 0.6rem;
+  border-bottom: 1.5px solid var(--rule);
+}
+.prose th:first-child,
+.prose td:first-child {
+  text-align: left;
+}
+.prose thead th {
+  border-bottom: 2px solid var(--ink);
+}
+.prose blockquote {
+  margin-inline: 0;
+  padding-left: 1rem;
+  border-left: 4px solid var(--signal);
+  color: var(--ink-soft);
+}

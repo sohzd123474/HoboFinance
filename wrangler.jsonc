@@ -1,0 +1,10 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "hobofinance",
+  "compatibility_date": "2026-11-13",
+  // Static site: Astro builds to ./dist and Workers serves it as static assets.
+  "assets": {
+    "directory": "./dist",
+    "not_found_handling": "404-page"
+  }
+}
