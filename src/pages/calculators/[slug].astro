@@ -1,6 +1,7 @@
 ---
 import Base from '../../layouts/Base.astro';
 import { calculators } from '../../lib/calculators';
+import { formatAmount } from '../../lib/amount';
 
 export function getStaticPaths() {
   return calculators.map((c) => ({ params: { slug: c.slug } }));
@@ -41,9 +42,11 @@ const chipLabel = (n: number, unit: string) =>
               <input
                 id={`f-${f.id}`}
                 name={f.id}
-                type="number"
+                type={f.unit === 'money' ? 'text' : 'number'}
                 inputmode="decimal"
-                value={f.value}
+                autocomplete="off"
+                data-money={f.unit === 'money' ? '' : undefined}
+                value={f.unit === 'money' ? formatAmount(String(f.value)) : f.value}
                 min={f.min}
                 max={f.max}
                 step={f.step}
@@ -286,6 +289,9 @@ const chipLabel = (n: number, unit: string) =>
   import { bySlug } from '../../lib/calculators';
   import type { Figure } from '../../lib/calculators';
   import { currencySymbol, money, years } from '../../lib/format';
+  import { formatAmount, parseAmount } from '../../lib/amount';
+
+  const valueOf = (input: HTMLInputElement) => ('money' in input.dataset ? (input.value.trim() === '' ? NaN : parseAmount(input.value)) : parseFloat(input.value));
 
   const root = document.querySelector<HTMLElement>('[data-calc]')!;
   const calc = bySlug(root.dataset.calc!)!;
@@ -303,7 +309,7 @@ const chipLabel = (n: number, unit: string) =>
     for (const f of calc.fields) {
       const input = root.querySelector<HTMLInputElement>(`#f-${f.id}`)!;
       const error = root.querySelector<HTMLElement>(`#e-${f.id}`)!;
-      const n = parseFloat(input.value);
+      const n = valueOf(input);
       let message = '';
       if (!Number.isFinite(n)) message = 'Enter a number.';
       else if (n < f.min) message = `Enter ${f.min} or more.`;
@@ -395,12 +401,23 @@ const chipLabel = (n: number, unit: string) =>
   const paintChips = () =>
     chips.forEach((b) => {
       const input = root.querySelector<HTMLInputElement>(`#${b.dataset.for}`)!;
-      b.setAttribute('aria-pressed', String(parseFloat(input.value) === Number(b.dataset.value)));
+      b.setAttribute('aria-pressed', String(valueOf(input) === Number(b.dataset.value)));
     });
   chips.forEach((b) =>
     b.addEventListener('click', () => {
-      root.querySelector<HTMLInputElement>(`#${b.dataset.for}`)!.value = b.dataset.value!;
+      const input = root.querySelector<HTMLInputElement>(`#${b.dataset.for}`)!;
+      input.value = 'money' in input.dataset ? formatAmount(b.dataset.value!) : b.dataset.value!;
       update();
+    }),
+  );
+  // Dollar boxes gain thousands separators as you type; the caret keeps its place among the digits.
+  root.querySelectorAll<HTMLInputElement>('input[data-money]').forEach((el) =>
+    el.addEventListener('input', () => {
+      const digitsBefore = el.value.slice(0, el.selectionStart ?? el.value.length).replace(/[^\d.]/g, '').length;
+      el.value = formatAmount(el.value);
+      let pos = 0;
+      for (let seen = 0; pos < el.value.length && seen < digitsBefore; pos++) if (/[\d.]/.test(el.value[pos])) seen++;
+      el.setSelectionRange(pos, pos);
     }),
   );
   root.querySelectorAll('input').forEach((el) => el.addEventListener('input', update));

@@ -1,3 +1,5 @@
+import { PercentInput } from '../PercentInput';
+import { MoneyInput } from '../MoneyInput';
 import { MAX_MONTHS, MIN_MONTHS, clampMonths, parkingResult, type InterestMethod } from '../../lib/parking';
 import { num, sgd, useStored } from '../../lib/storage';
 import { Presets } from '../Presets';
@@ -87,7 +89,7 @@ export default function Parking() {
           <div className="controls">
             <div>
               <label htmlFor="pk-amount">Amount (S$)</label>
-              <input id="pk-amount" type="number" min={0} step={500} value={o.amount} onChange={(e) => setO((p) => ({ ...p, amount: num(e.target.value) }))} />
+              <MoneyInput id="pk-amount" value={o.amount} onChange={(v) => setO((p) => ({ ...p, amount: v }))} />
               <Presets label="Amount" options={[5000, 10000, 50000, 100000]} current={o.amount} onPick={(v) => setO((p) => ({ ...p, amount: v }))} />
             </div>
             <div>
@@ -114,7 +116,7 @@ export default function Parking() {
               </div>
               <div>
                 <label htmlFor={`pk-rate-${i}`}>Option {i + 1} rate (% a year)</label>
-                <input id={`pk-rate-${i}`} type="number" min={0} step={0.05} value={x.rate} onChange={(e) => setOption(i, { rate: num(e.target.value) })} />
+                <PercentInput id={`pk-rate-${i}`} value={x.rate} onChange={(v) => setOption(i, { rate: v })} />
                 <Presets label={`Option ${i + 1} rate`} options={[1, 1.5, 2, 2.5, 3, 3.5, 4]} current={x.rate} onPick={(v) => setOption(i, { rate: v })} />
               </div>
               <div>

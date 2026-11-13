@@ -1,3 +1,5 @@
+import { PercentInput } from '../PercentInput';
+import { MoneyInput } from '../MoneyInput';
 import { useMemo } from 'react';
 import { CartesianGrid, Line, LineChart, ReferenceLine, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import { Presets } from '../Presets';
@@ -404,7 +406,7 @@ export default function Ssb() {
           <div className="controls" style={{ alignItems: 'start' }}>
             <div>
               <label htmlFor="ssb-amount">Amount (S$)</label>
-              <input id="ssb-amount" type="number" min={500} step={500} inputMode="decimal" value={o.amount} onChange={(e) => set('amount', num(e.target.value))} />
+              <MoneyInput id="ssb-amount" value={o.amount} onChange={(v) => set('amount', v)} />
               <Presets label="Amount" options={[1000, 10000, 50000, 100000, 200000]} current={o.amount} onPick={(v) => set('amount', v)} />
             </div>
             <div>
@@ -414,7 +416,7 @@ export default function Ssb() {
             </div>
             <div>
               <label htmlFor="ssb-oa">CPF OA rate (% a year)</label>
-              <input id="ssb-oa" type="number" min={0} step={0.1} inputMode="decimal" value={o.oaRate} onChange={(e) => set('oaRate', num(e.target.value))} />
+              <PercentInput id="ssb-oa" value={o.oaRate} onChange={(v) => set('oaRate', v)} />
               <Presets
                 label="CPF OA rate"
                 options={[2.5, 3, 3.5, 4].map((v) => ({ label: `${v}%`, value: v }))}
@@ -424,7 +426,7 @@ export default function Ssb() {
             </div>
             <div>
               <label htmlFor="ssb-reinvest">Rate earned on reinvested interest (% a year)</label>
-              <input id="ssb-reinvest" type="number" min={0} step={0.1} inputMode="decimal" value={reinvestRate} onChange={(e) => set('reinvestRate', num(e.target.value))} />
+              <PercentInput id="ssb-reinvest" value={reinvestRate} onChange={(v) => set('reinvestRate', v)} />
               <Presets
                 label="Reinvestment rate"
                 options={[0, 1, 2, 2.5, 4].map((v) => ({ label: `${v}%`, value: v }))}

@@ -1,3 +1,5 @@
+import { MoneyInput } from '../MoneyInput';
+import { PercentInput } from '../PercentInput';
 import { useMemo } from 'react';
 import { CartesianGrid, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import { Presets, type Preset } from '../Presets';
@@ -80,7 +82,13 @@ function Field({
       <label htmlFor={id}>
         {label} {unverified && <span className="tag-unsure">unverified</span>}
       </label>
-      <input id={id} type="number" inputMode="decimal" min={min} max={max} step={step} value={value} onChange={(e) => onChange(Math.max(min, num(e.target.value)))} />
+      {label.includes('(S$)') ? (
+        <MoneyInput id={id} value={value} onChange={(v) => onChange(Math.max(min, v))} />
+      ) : label.includes('(%') ? (
+        <PercentInput id={id} value={value} onChange={(v) => onChange(Math.max(min, v))} />
+      ) : (
+        <input id={id} type="number" inputMode="decimal" min={min} max={max} step={step} value={value} onChange={(e) => onChange(Math.max(min, num(e.target.value)))} />
+      )}
       {slider && (
         <input
           type="range"

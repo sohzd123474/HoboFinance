@@ -2,8 +2,7 @@
 import { getCollection } from 'astro:content';
 import Base from '../layouts/Base.astro';
 import LinkList from '../components/LinkList.astro';
-import { tools } from '../lib/tools';
-import { calculators } from '../lib/calculators';
+import { stages } from '../lib/stages';
 
 const posts = (await getCollection('blog', (p) => !p.data.draft))
   .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())
@@ -11,30 +10,40 @@ const posts = (await getCollection('blog', (p) => !p.data.draft))
 const date = (d: Date) => d.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
 ---
 
-<Base title="Hobo Finance" description="Free investing tools, calculators and guides for people in Singapore.">
+<Base title="Hobo Finance" description="Free investing tools, calculators and guides for people in Singapore, in the order most people need them.">
   <div class="wrap page-head">
-    <h1 class="home-title">Hobo Finance</h1>
-    <p class="lede">Free investing tools, calculators and guides for people in Singapore.</p>
+    <h1 class="home-title">Start here</h1>
+    <p class="lede">
+      Free money tools for people in Singapore, in the order most people need them. Begin at the top, or jump to where
+      you are now.
+    </p>
   </div>
 
-  {
-    tools.some((t) => t.ready) && (
-      <section class="wrap">
-        <h2>Tools</h2>
-        <LinkList items={tools.filter((t) => t.ready).map((t) => ({ href: `/tools/${t.slug}/`, title: t.title, blurb: t.blurb }))} />
-      </section>
-    )
-  }
-
-  <section class="wrap">
-    <h2>Basic calculators</h2>
-    <LinkList items={calculators.map((c) => ({ href: `/calculators/${c.slug}/`, title: c.title, blurb: c.blurb }))} />
-  </section>
+  <div class="wrap">
+    <ol class="stages">
+      {
+        stages.map((s) => (
+          <li>
+            <h2>{s.title}</h2>
+            <p class="stage-intro">{s.intro}</p>
+            <ul>
+              {s.steps.map((step) => (
+                <li>
+                  <a href={step.href}>{step.question}</a>
+                  <span class="tool-name">{step.title}</span>
+                </li>
+              ))}
+            </ul>
+          </li>
+        ))
+      }
+    </ol>
+  </div>
 
   {
     posts.length > 0 && (
       <section class="wrap">
-        <h2>Latest posts</h2>
+        <h2 class="plain-h2">Latest posts</h2>
         <LinkList items={posts.map((p) => ({ href: `/blog/${p.id}/`, title: p.data.title, blurb: `${date(p.data.pubDate)}. ${p.data.description}` }))} />
         <p style="margin-top:1rem">
           <a href="/blog/">All posts</a>
@@ -48,10 +57,72 @@ const date = (d: Date) => d.toLocaleDateString('en-GB', { day: 'numeric', month:
   .home-title {
     font-size: var(--step-3);
   }
-  section h2 {
+  .plain-h2 {
     font-size: var(--step-2);
   }
-  section {
-    padding-block: 2.5rem 0 !important;
+  /* The stages are a real sequence, so they are numbered and joined by a line. */
+  .stages {
+    list-style: none;
+    counter-reset: stage;
+    margin: 2rem 0 0;
+    padding: 0;
+    max-width: 44rem;
+  }
+  .stages > li {
+    counter-increment: stage;
+    position: relative;
+    padding: 0 0 2.25rem 3.25rem;
+  }
+  .stages > li::before {
+    content: counter(stage);
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 2.1rem;
+    height: 2.1rem;
+    display: grid;
+    place-items: center;
+    border: 1.5px solid var(--ink);
+    border-radius: 50%;
+    background: var(--paper);
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+  }
+  .stages > li::after {
+    content: '';
+    position: absolute;
+    left: calc(1.05rem - 1px);
+    top: 2.1rem;
+    bottom: 0;
+    border-left: 2px solid var(--rule);
+  }
+  .stages > li:last-child::after {
+    display: none;
+  }
+  .stages h2 {
+    font-size: var(--step-2);
+    padding-top: 0.2rem;
+  }
+  .stage-intro {
+    color: var(--ink-soft);
+    margin-top: 0.25rem;
+  }
+  .stages ul {
+    list-style: none;
+    padding: 0;
+    margin: 0.8rem 0 0;
+  }
+  .stages ul li {
+    padding-block: 0.6rem;
+    border-top: 1.5px solid var(--rule);
+  }
+  .stages ul a {
+    font-weight: 700;
+    font-size: var(--step-0);
+  }
+  .tool-name {
+    display: block;
+    color: var(--ink-soft);
+    font-size: var(--step--1);
   }
 </style>

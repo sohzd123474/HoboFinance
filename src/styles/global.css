@@ -603,3 +603,39 @@ table.data th.wrap-cell {
   color: var(--paper);
   font-weight: 700;
 }
+
+/* An input with a unit shown after it, such as % */
+.suffix-wrap {
+  display: flex;
+  align-items: stretch;
+  width: 100%;
+}
+.suffix-wrap input {
+  flex: 1;
+  min-width: 0;
+  border-right: 0 !important;
+  border-radius: 3px 0 0 3px !important;
+}
+.suffix-wrap .suffix {
+  display: grid;
+  place-items: center;
+  padding-inline: 0.6rem;
+  border: 1.5px solid var(--ink);
+  border-radius: 0 3px 3px 0;
+  background: var(--paper);
+  color: var(--ink-soft);
+  font-weight: 600;
+}
+
+/* Link to the next tool along the start-here path */
+.next-step {
+  margin-top: 3rem;
+  padding-top: 1.25rem;
+  border-top: 1.5px solid var(--rule);
+}
+.next-step a {
+  font-weight: 700;
+}
+.next-step p:first-child {
+  font-size: var(--step-1);
+}

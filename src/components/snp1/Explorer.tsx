@@ -1,3 +1,5 @@
+import { MoneyInput } from '../MoneyInput';
+import { Presets } from '../Presets';
 import { useMemo } from 'react';
 import { CartesianGrid, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import {
@@ -13,7 +15,7 @@ import {
   type VariantId,
 } from '../../lib/backtest';
 import { NUMBER_ONE, RANKINGS_RESEARCHED_ON, SOURCES, TOP7_QUARTERLY } from '../../data/rankings';
-import { pct, usd, useJson, useStored, num } from '../../lib/storage';
+import { pct, usd, useJson, useStored } from '../../lib/storage';
 
 interface Meta {
   builtAt: string;
@@ -273,7 +275,8 @@ export default function Explorer() {
             </div>
             <div>
               <label htmlFor="bt-monthly">Invested each month (USD)</label>
-              <input id="bt-monthly" type="number" min={1} step={50} value={o.monthly} onChange={(e) => set('monthly', num(e.target.value))} />
+              <MoneyInput id="bt-monthly" value={o.monthly} onChange={(v) => set('monthly', v)} />
+              <Presets label="Invested each month" options={[100, 500, 1000, 2000, 5000]} current={o.monthly} onPick={(v) => set('monthly', v)} />
             </div>
             <div>
               <span className="ctl-label" id="cad">Ranking check</span>

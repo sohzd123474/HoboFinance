@@ -3,6 +3,7 @@ import '@fontsource-variable/big-shoulders-display/wght';
 import '@fontsource-variable/atkinson-hyperlegible-next/wght';
 import '../styles/global.css';
 import { CURRENCIES } from '../lib/format';
+import { nextStep } from '../lib/stages';
 
 interface Props {
   title: string;
@@ -10,6 +11,7 @@ interface Props {
 }
 const { title, description } = Astro.props;
 const path = Astro.url.pathname;
+const next = nextStep(path);
 const fullTitle = title === 'Hobo Finance' ? title : `${title} | Hobo Finance`;
 const canonical = new URL(path, Astro.site);
 ---
@@ -44,6 +46,7 @@ const canonical = new URL(path, Astro.site);
       <div class="wrap">
         <a class="wordmark" href="/">Hobo Finance</a>
         <nav aria-label="Main">
+          <a href="/" aria-current={path === "/" ? "page" : undefined}>Start here</a>
           <a href="/tools/" aria-current={path.startsWith('/tools') ? 'page' : undefined}>Tools</a>
           <a href="/calculators/" aria-current={path.startsWith('/calculators') ? 'page' : undefined}>Basics</a>
           <a href="/blog/" aria-current={path.startsWith('/blog') ? 'page' : undefined}>Blog</a>
@@ -60,6 +63,18 @@ const canonical = new URL(path, Astro.site);
 
     <main>
       <slot />
+      {
+        next && (
+          <nav class="wrap next-step" aria-label="Next step">
+            <p>
+              Next: <a href={next.href}>{next.question}</a>
+            </p>
+            <p class="note">
+              {next.title}. Or go back to the <a href="/">full path</a>.
+            </p>
+          </nav>
+        )
+      }
     </main>
 
     <footer class="site-foot">

@@ -1,3 +1,5 @@
+import { PercentInput } from '../PercentInput';
+import { MoneyInput } from '../MoneyInput';
 import { useMemo } from 'react';
 import { CartesianGrid, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import { CSPX_VS_SPYL, ESTATE_TAX, ETFS, RESEARCHED_ON, etfByTicker, type Etf, type Sourced } from '../../data/etfs';
@@ -123,17 +125,17 @@ export default function TaxDrag() {
           </div>
           <div>
             <label htmlFor={`${id}-er`}>Expense ratio (% a year)</label>
-            <input id={`${id}-er`} type="number" min={0} step={0.01} value={o[erKey]} onChange={(e) => set(erKey, num(e.target.value))} />
+            <PercentInput id={`${id}-er`} value={o[erKey]} onChange={(v) => set(erKey, v)} />
             <Presets
               label={`Fund ${slot} expense ratio`}
-              options={[{ label: `${etf.ticker}: ${toPct(etf.expenseRatio)}`, value: toPct(etf.expenseRatio) }]}
+              options={[{ label: `${etf.ticker}: ${toPct(etf.expenseRatio)}%`, value: toPct(etf.expenseRatio) }, { label: '0.1%', value: 0.1 }, { label: '0.5%', value: 0.5 }, { label: '1%', value: 1 }]}
               current={o[erKey]}
               onPick={(v) => set(erKey, v)}
             />
           </div>
           <div>
             <label htmlFor={`${id}-wht`}>Dividend withholding (%)</label>
-            <input id={`${id}-wht`} type="number" min={0} max={100} step={0.1} value={o[whtKey]} onChange={(e) => set(whtKey, num(e.target.value))} />
+            <PercentInput id={`${id}-wht`} value={o[whtKey]} onChange={(v) => set(whtKey, v)} />
             <Presets
               label={`Fund ${slot} dividend withholding`}
               options={[...new Set([0, 15, 30, toPct(etf.withholding)])].sort((x, y) => x - y)}
@@ -157,22 +159,22 @@ export default function TaxDrag() {
           <div className="controls">
             <div>
               <label htmlFor="td-size">Portfolio size (S$)</label>
-              <input id="td-size" type="number" min={0} step={1000} value={o.size} onChange={(e) => set('size', num(e.target.value))} />
+              <MoneyInput id="td-size" value={o.size} onChange={(v) => set('size', v)} />
               <Presets label="Portfolio size" options={[10000, 50000, 100000, 500000]} current={o.size} onPick={(v) => set('size', v)} />
             </div>
             <div>
               <label htmlFor="td-added">Added each year (S$)</label>
-              <input id="td-added" type="number" min={0} step={500} value={o.added} onChange={(e) => set('added', num(e.target.value))} />
+              <MoneyInput id="td-added" value={o.added} onChange={(v) => set('added', v)} />
               <Presets label="Added each year" options={[0, 6000, 12000, 24000]} current={o.added} onPick={(v) => set('added', v)} />
             </div>
             <div>
               <label htmlFor="td-return">Return before costs (% a year)</label>
-              <input id="td-return" type="number" step={0.1} value={o.grossReturn} onChange={(e) => set('grossReturn', num(e.target.value))} />
+              <PercentInput id="td-return" value={o.grossReturn} onChange={(v) => set('grossReturn', v)} />
               <Presets label="Return before costs" options={[4, 6, 7, 8, 10]} current={o.grossReturn} onPick={(v) => set('grossReturn', v)} />
             </div>
             <div>
               <label htmlFor="td-yield">Dividend yield (% a year)</label>
-              <input id="td-yield" type="number" min={0} step={0.1} value={o.dividendYield} onChange={(e) => set('dividendYield', num(e.target.value))} />
+              <PercentInput id="td-yield" value={o.dividendYield} onChange={(v) => set('dividendYield', v)} />
               <Presets label="Dividend yield" options={[1, 1.5, 2, 3]} current={o.dividendYield} onPick={(v) => set('dividendYield', v)} />
             </div>
             <div>
@@ -182,7 +184,7 @@ export default function TaxDrag() {
             </div>
             <div>
               <label htmlFor="td-comm">Extra commission per LSE order (S$)</label>
-              <input id="td-comm" type="number" min={0} step={0.5} value={o.commission} onChange={(e) => set('commission', num(e.target.value))} />
+              <MoneyInput id="td-comm" value={o.commission} onChange={(v) => set('commission', v)} />
               <Presets label="Extra commission per LSE order" options={[0, 2, 5, 10]} current={o.commission} onPick={(v) => set('commission', v)} />
             </div>
             <div>
