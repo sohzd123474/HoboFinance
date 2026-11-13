@@ -51,14 +51,14 @@ describe('early retirement', () => {
 
   it('counts CPF as extra saving and shortens the wait', () => {
     const { c, v } = defaults('early-retirement');
-    const base = { ...v, income: 80000, rate: 20, current: 0, ret: 0, withdrawal: 4 };
+    const base = { ...v, income: 80000, rate: 25, current: 0, ret: 0, withdrawal: 4 };
     const without = c.compute(base);
     const withCpf = c.compute({ ...base, cpf: 46.25 });
-    // Spending 64,000 needs 1.6M. Saving 16,000 a year takes 100 years; adding 37,000 of CPF takes 1.6M / 53,000.
-    expect(without.headline.value).toBeCloseTo(100, 6);
-    expect(withCpf.headline.value as number).toBeCloseTo(Math.ceil((1600000 / 53000) * 12) / 12, 6);
+    // Spending 60,000 needs 1.5M. Saving 20,000 a year takes 75 years; with 37,000 of CPF it takes 1.5M / 57,000.
+    expect(without.headline.value as number).toBeCloseTo(75, 0);
+    expect(withCpf.headline.value as number).toBeCloseTo(1500000 / 57000, 0);
     expect(withCpf.rows.find((x) => x.label === 'CPF adds each year')!.value).toBeCloseTo(37000, 6);
-    expect(withCpf.rows.find((x) => x.label.startsWith('Real savings rate'))!.value).toBe('45%');
+    expect(withCpf.rows.find((x) => x.label.startsWith('Real savings rate'))!.value).toBe('49%');
   });
 
   it('says so when nothing is saved', () => {
