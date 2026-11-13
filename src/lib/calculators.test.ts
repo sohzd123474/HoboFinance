@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { bySlug, calculators, DOLLAR_RATES } from './calculators';
+import { bySlug, calculators, CPF_SHARE_OF_TAKE_HOME, DOLLAR_RATES } from './calculators';
 
 const defaults = (slug: string) => {
   const c = bySlug(slug)!;
@@ -31,6 +31,10 @@ describe('every calculator', () => {
 });
 
 describe('early retirement', () => {
+  it('derives the CPF share of take-home pay from the 20% and 17% rates', () => {
+    expect(CPF_SHARE_OF_TAKE_HOME).toBeCloseTo(46.25, 10);
+  });
+
   it('needs 25 times spending at a 4% withdrawal rate', () => {
     const { c, v } = defaults('early-retirement');
     const r = c.compute({ ...v, income: 100000, rate: 40, withdrawal: 4 });
@@ -43,6 +47,18 @@ describe('early retirement', () => {
     // Save half: each year saved covers one year of spending, so 25 years to reach 25x.
     const r = c.compute({ ...v, income: 80000, rate: 50, current: 0, ret: 0, withdrawal: 4 });
     expect(r.headline.value).toBeCloseTo(25, 6);
+  });
+
+  it('counts CPF as extra saving and shortens the wait', () => {
+    const { c, v } = defaults('early-retirement');
+    const base = { ...v, income: 80000, rate: 20, current: 0, ret: 0, withdrawal: 4 };
+    const without = c.compute(base);
+    const withCpf = c.compute({ ...base, cpf: 46.25 });
+    // Spending 64,000 needs 1.6M. Saving 16,000 a year takes 100 years; adding 37,000 of CPF takes 1.6M / 53,000.
+    expect(without.headline.value).toBeCloseTo(100, 6);
+    expect(withCpf.headline.value as number).toBeCloseTo(Math.ceil((1600000 / 53000) * 12) / 12, 6);
+    expect(withCpf.rows.find((x) => x.label === 'CPF adds each year')!.value).toBeCloseTo(37000, 6);
+    expect(withCpf.rows.find((x) => x.label.startsWith('Real savings rate'))!.value).toBe('45%');
   });
 
   it('says so when nothing is saved', () => {

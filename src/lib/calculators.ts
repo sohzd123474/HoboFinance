@@ -39,6 +39,26 @@ export interface Calculator {
   explain: string[];
 }
 
+/**
+ * CPF contributions for an employee aged 55 or under: 20% of the wage from the
+ * employee and 17% from the employer. Take-home pay is the other 80% of the
+ * wage, so total CPF is 37 / 80 = 46.25% of take-home pay.
+ * Source: https://www.cpf.gov.sg/employer/employer-obligations/how-much-cpf-contributions-to-pay
+ */
+export const CPF_EMPLOYEE_RATE = 20;
+export const CPF_EMPLOYER_RATE = 17;
+export const CPF_SHARE_OF_TAKE_HOME = ((CPF_EMPLOYEE_RATE + CPF_EMPLOYER_RATE) / (100 - CPF_EMPLOYEE_RATE)) * 100;
+
+/** Rates compared in the "what a dollar becomes" calculator. */
+export const DOLLAR_RATES = [
+  { rate: 2.5, label: 'CPF Ordinary Account' },
+  { rate: 4, label: 'CPF Special and MediSave' },
+  { rate: 5, label: 'dividend shares' },
+  { rate: 7, label: 'S&P 500 after inflation' },
+  { rate: 10, label: 'S&P 500 long-run average' },
+  { rate: 15, label: 'an exceptional run' },
+];
+
 export const calculators: Calculator[] = [
   {
     slug: 'compound-interest',
@@ -158,6 +178,20 @@ export const calculators: Calculator[] = [
     fields: [
       { id: 'income', label: 'Take-home pay a year', unit: 'money', value: 60000, min: 1, max: 10000000, step: 1000, presets: [36000, 60000, 84000, 120000, 180000] },
       { id: 'rate', label: 'Share of pay you save', unit: 'percent', value: 30, min: 0, max: 99, step: 1, presets: [10, 20, 30, 50, 70] },
+      {
+        id: 'cpf',
+        label: 'CPF paid in on top of take-home pay',
+        unit: 'percent',
+        value: 0,
+        min: 0,
+        max: 100,
+        step: 0.01,
+        hint: 'As a share of take-home pay. An employee aged 55 or under gets 20% from their own pay plus 17% from the employer, which is 46.25% of take-home pay.',
+        presets: [
+          { label: 'Leave out CPF', value: 0 },
+          { label: 'Employee, 55 or under', value: CPF_SHARE_OF_TAKE_HOME },
+        ],
+      },
       { id: 'current', label: 'Invested so far', unit: 'money', value: 0, min: 0, max: 100000000, step: 1000, presets: [0, 20000, 100000, 300000] },
       { id: 'ret', label: 'Yearly return after inflation', unit: 'percent', value: 5, min: 0, max: 15, step: 0.1, presets: [3, 4, 5, 7] },
       { id: 'withdrawal', label: 'Withdrawal rate', unit: 'percent', value: 4, min: 1, max: 10, step: 0.1, hint: 'Share of the pot you spend each year once retired.', presets: [3, 3.5, 4, 5] },
@@ -165,7 +199,9 @@ export const calculators: Calculator[] = [
     compute: (v) => {
       const saved = (v.income * v.rate) / 100;
       const spend = v.income - saved;
-      const at = (ratePct: number) => fire(v.income * (1 - ratePct / 100), v.withdrawal, v.current, (v.income * ratePct) / 100 / 12, v.ret);
+      const cpf = (v.income * (v.cpf ?? 0)) / 100;
+      const at = (ratePct: number) =>
+        fire(v.income * (1 - ratePct / 100), v.withdrawal, v.current, ((v.income * ratePct) / 100 + cpf) / 12, v.ret);
       const f = at(v.rate);
       const others = [10, 25, 50, 75].filter((r) => r !== v.rate);
       const yearsRow = (label: string, y: number | null): Figure =>
@@ -174,6 +210,12 @@ export const calculators: Calculator[] = [
         headline: yearsRow('Years until you can retire', f.years),
         rows: [
           { label: 'You save each year', value: saved, kind: 'money' },
+          ...(cpf > 0
+            ? [
+                { label: 'CPF adds each year', value: cpf, kind: 'money' as const },
+                { label: 'Real savings rate, counting CPF', value: `${(((saved + cpf) / (v.income + cpf)) * 100).toFixed(0)}%`, kind: 'text' as const },
+              ]
+            : []),
           { label: 'You spend each year', value: spend, kind: 'money' },
           { label: 'Pot you need', value: f.target, kind: 'money' },
           ...others.map((r) => yearsRow(`If you saved ${r}% instead`, at(r).years)),
@@ -185,7 +227,9 @@ export const calculators: Calculator[] = [
     },
     explain: [
       'Whatever you do not save, you spend. The pot you need is that yearly spending divided by the withdrawal rate. Saving more helps twice: the pot grows faster and the target gets smaller, because you have shown you can live on less.',
-      'It assumes your pay and spending stay the same in today’s money, and that returns arrive evenly. It leaves out CPF; for a Singapore plan that includes it, use the FIRE and CPF tool once it is listed under Tools.',
+      'CPF is saving you are made to do. An employee aged 55 or under puts in 20% of their wage and the employer adds another 17%, so 37% of the wage is saved before any of it reaches the bank account. Someone who saves nothing from take-home pay is still saving about 32% of everything they earn (37 out of 117), and someone who saves 30% of take-home pay is really saving about 52%. Choose “Employee, 55 or under” above to count it.',
+      'Counting CPF makes the answer optimistic in two ways. CPF savings cannot be spent before 55, and only the part above your retirement sum can be withdrawn then, so they cannot fund the years before that. And CPF earns its own rates (2.5% in the Ordinary Account, about 4% in the others), not the return entered here. The rates apply up to the monthly wage ceiling and are lower above age 55.',
+      'It assumes your pay and spending stay the same in today’s money, and that returns arrive evenly.',
     ],
   },
   {
@@ -259,16 +303,6 @@ export const calculators: Calculator[] = [
       'The rates are examples, not promises. 2.5% and 4% are the current floor rates on CPF accounts. 7% is close to what the S&P 500 has returned after inflation over the long run and 10% before inflation. 15% a year has happened over single decades but has never lasted a working lifetime. Amounts are not adjusted for rising prices.',
     ],
   },
-];
-
-/** Rates compared in the "what a dollar becomes" calculator. */
-export const DOLLAR_RATES = [
-  { rate: 2.5, label: 'CPF Ordinary Account' },
-  { rate: 4, label: 'CPF Special and MediSave' },
-  { rate: 5, label: 'dividend shares' },
-  { rate: 7, label: 'S&P 500 after inflation' },
-  { rate: 10, label: 'S&P 500 long-run average' },
-  { rate: 15, label: 'an exceptional run' },
 ];
 
 export const bySlug = (slug: string) => calculators.find((c) => c.slug === slug);
