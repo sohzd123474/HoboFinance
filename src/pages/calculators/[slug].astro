@@ -149,14 +149,15 @@ const chipLabel = (n: number, unit: string) =>
   .control {
     display: flex;
     align-items: stretch;
-    border: 1.5px solid var(--ink);
-    border-radius: 3px;
+    overflow: hidden;
+    border: 1px solid var(--field-line);
+    border-radius: var(--radius-sm);
     background: var(--field);
   }
   .control:focus-within {
-    outline: 3px solid var(--signal);
-    outline-offset: 2px;
-    box-shadow: 0 0 0 5px var(--ink);
+    border-color: var(--accent);
+    outline: 2px solid var(--accent);
+    outline-offset: 0;
   }
   .control input {
     flex: 1;
@@ -184,10 +185,10 @@ const chipLabel = (n: number, unit: string) =>
     font-weight: 600;
   }
   .unit:first-child {
-    border-right: 1.5px solid var(--ink);
+    border-right: 1px solid var(--rule);
   }
   .unit:last-child {
-    border-left: 1.5px solid var(--ink);
+    border-left: 1px solid var(--rule);
   }
   .hint,
   .error {
@@ -202,30 +203,39 @@ const chipLabel = (n: number, unit: string) =>
 
   /* The answer is printed on a ticket: body above the perforation, breakdown below. */
   .result {
-    background: var(--stock);
-    border: 1.5px solid var(--ink);
-    border-radius: 4px;
+    background: var(--card);
+    border: 1px solid var(--rule);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    overflow: hidden;
   }
   .result-top {
-    padding: 1.2rem 1.4rem 1.1rem;
+    padding: 1.3rem 1.4rem 1.4rem;
+    background: var(--hero);
+    color: var(--on-hero);
+  }
+  .result-top .result-label {
+    color: var(--hero-soft);
+    font-weight: 500;
   }
   .result-label {
     font-weight: 600;
   }
   .result-big {
     font-family: var(--display);
-    font-weight: 900;
-    font-size: clamp(2.2rem, 1.6rem + 2.5vw, 3.2rem);
-    line-height: 1;
-    margin-top: 0.15em;
+    font-weight: 700;
+    font-size: clamp(2rem, 1.5rem + 2.2vw, 2.9rem);
+    line-height: 1.1;
+    letter-spacing: -0.03em;
+    font-variant-numeric: tabular-nums;
+    margin-top: 0.2em;
     overflow-wrap: anywhere;
   }
   .result-rows {
     margin: 0;
     padding: 0.9rem 1.4rem 1.1rem;
-    border-top: 2px dashed var(--ink);
     display: grid;
-    gap: 0.45rem;
+    gap: 0.55rem;
   }
   .result-rows :global(div) {
     display: flex;
@@ -261,10 +271,11 @@ const chipLabel = (n: number, unit: string) =>
   .result-note {
     margin: 0;
     padding: 0.8rem 1.4rem;
-    border-top: 1.5px solid var(--ink);
-    background: var(--signal);
-    color: var(--on-signal);
-    border-radius: 0 0 2px 2px;
+    border-top: 1px solid var(--rule);
+    background: var(--note-bg);
+    color: var(--note-ink);
+    font-size: var(--step--1);
+    border-radius: 0 0 var(--radius) var(--radius);
   }
 
   .chart {
@@ -290,7 +301,7 @@ const chipLabel = (n: number, unit: string) =>
     width: 0.8em;
     height: 0.8em;
     margin-right: 0.4em;
-    border: 1.5px solid var(--ink);
+    border-radius: 3px;
     vertical-align: -0.05em;
   }
   .chart :global(svg) {
@@ -301,7 +312,7 @@ const chipLabel = (n: number, unit: string) =>
   }
   .chart :global(.bar):hover :global(rect),
   .chart :global(.bar):focus :global(rect) {
-    stroke-width: 2.5;
+    opacity: 0.8;
   }
   .chart :global(.bar):focus {
     outline: none;
@@ -388,15 +399,15 @@ const chipLabel = (n: number, unit: string) =>
             : '';
         return `<g class="bar" tabindex="0" role="img" aria-label="${esc(text)}" data-tip="${esc(text)}">
           <rect x="${i * slot}" y="0" width="${slot}" height="${H - padB}" fill="transparent" stroke="none"/>
-          <rect x="${x}" y="${base - hb}" width="${bw}" height="${hb}" style="fill:${COLORS[0]};stroke:var(--ink)" stroke-width="1"/>
-          ${he > 0 ? `<rect x="${x}" y="${base - hb - he}" width="${bw}" height="${he}" style="fill:${COLORS[1]};stroke:var(--ink)" stroke-width="1"/>` : ''}
+          <rect x="${x}" y="${base - hb}" width="${bw}" height="${hb}" style="fill:${COLORS[0]}"/>
+          ${he > 0 ? `<rect x="${x}" y="${base - hb - he}" width="${bw}" height="${he}" style="fill:${COLORS[1]}"/>` : ''}
           ${label}
         </g>`;
       })
       .join('');
 
     chart.innerHTML = `<svg viewBox="0 0 ${W} ${H}" role="group" aria-label="Bar chart, one bar per year">
-      <line x1="0" x2="${W}" y1="${H - padB}" y2="${H - padB}" style="stroke:var(--ink)" stroke-width="1.5"/>${bars}</svg>`;
+      <line x1="0" x2="${W}" y1="${H - padB}" y2="${H - padB}" style="stroke:var(--rule)" stroke-width="1"/>${bars}</svg>`;
 
     out('legend').innerHTML =
       legend.length > 1 ? legend.map((l, i) => `<span><i style="background:${COLORS[i]}"></i>${esc(l)}</span>`).join('') : '';

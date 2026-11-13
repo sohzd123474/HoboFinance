@@ -202,7 +202,7 @@ export default function Leverage() {
               <XAxis dataKey="date" tickFormatter={(d: string) => d.slice(0, 4)} minTickGap={40} stroke="var(--ink-soft)" tick={{ fill: 'var(--ink-soft)', fontSize: 12 }} />
               <YAxis scale="log" domain={['auto', 'auto']} allowDataOverflow width={56} stroke="var(--ink-soft)" tick={{ fill: 'var(--ink-soft)', fontSize: 12 }} tickFormatter={(v: number) => times(v)} />
               <Tooltip
-                contentStyle={{ background: 'var(--paper)', border: '1.5px solid var(--ink)', borderRadius: 3, color: 'var(--ink)' }}
+                contentStyle={{ background: 'var(--card)', border: '1px solid var(--rule)', borderRadius: 8, color: 'var(--ink)' }}
                 formatter={(value, name) => [times(Number(value)), name === 'index' ? INDEX : name === 'sim' ? `${o.leverage}x simulated` : PRODUCT]}
               />
               <Line dataKey="index" stroke="var(--c2)" strokeWidth={2} dot={false} isAnimationActive={false} />

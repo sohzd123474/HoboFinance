@@ -290,7 +290,7 @@ export default function Ssb() {
               <XAxis dataKey="month" tickFormatter={(d: string) => d.slice(0, 4)} minTickGap={40} stroke="var(--ink-soft)" tick={{ fill: 'var(--ink-soft)', fontSize: 12 }} />
               <YAxis width={44} stroke="var(--ink-soft)" tick={{ fill: 'var(--ink-soft)', fontSize: 12 }} tickFormatter={(v: number) => `${v}%`} domain={[0, 'auto']} />
               <Tooltip
-                contentStyle={{ background: 'var(--paper)', border: '1.5px solid var(--ink)', borderRadius: 3, color: 'var(--ink)' }}
+                contentStyle={{ background: 'var(--card)', border: '1px solid var(--rule)', borderRadius: 8, color: 'var(--ink)' }}
                 labelFormatter={(d) => monthName(String(d))}
                 formatter={(value, name) => [rate(Number(value)), seriesName(name)]}
               />

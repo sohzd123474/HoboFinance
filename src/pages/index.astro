@@ -82,10 +82,12 @@ const date = (d: Date) => d.toLocaleDateString('en-GB', { day: 'numeric', month:
     height: 2.1rem;
     display: grid;
     place-items: center;
-    border: 1.5px solid var(--ink);
+    border: 1px solid var(--rule);
     border-radius: 50%;
-    background: var(--paper);
-    font-weight: 700;
+    background: var(--card);
+    color: var(--accent);
+    box-shadow: var(--shadow);
+    font-weight: 600;
     font-variant-numeric: tabular-nums;
   }
   .stages > li::after {
@@ -94,7 +96,7 @@ const date = (d: Date) => d.toLocaleDateString('en-GB', { day: 'numeric', month:
     left: calc(1.05rem - 1px);
     top: 2.1rem;
     bottom: 0;
-    border-left: 2px solid var(--rule);
+    border-left: 1px solid var(--rule);
   }
   .stages > li:last-child::after {
     display: none;
@@ -114,11 +116,12 @@ const date = (d: Date) => d.toLocaleDateString('en-GB', { day: 'numeric', month:
   }
   .stages ul li {
     padding-block: 0.6rem;
-    border-top: 1.5px solid var(--rule);
+    border-top: 1px solid var(--rule);
   }
   .stages ul a {
-    font-weight: 700;
+    font-weight: 600;
     font-size: var(--step-0);
+    text-decoration: none;
   }
   .tool-name {
     display: block;

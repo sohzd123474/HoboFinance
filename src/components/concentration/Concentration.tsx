@@ -267,7 +267,7 @@ export default function Concentration() {
                   <YAxis type="category" dataKey="key" width={60} stroke="var(--ink-soft)" tick={{ fill: 'var(--ink-soft)', fontSize: 12 }} interval={0} />
                   <Tooltip
                     cursor={{ fill: 'var(--stock)' }}
-                    contentStyle={{ background: 'var(--paper)', border: '1.5px solid var(--ink)', borderRadius: 3, color: 'var(--ink)' }}
+                    contentStyle={{ background: 'var(--card)', border: '1px solid var(--rule)', borderRadius: 8, color: 'var(--ink)' }}
                     formatter={(value, name) => [`${Number(value).toFixed(1)}%`, SERIES[String(name)] ?? String(name)]}
                   />
                   <Bar dataKey="direct" stackId="x" fill="var(--c1)" isAnimationActive={false} />

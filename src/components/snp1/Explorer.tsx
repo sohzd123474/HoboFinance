@@ -420,7 +420,7 @@ export default function Explorer() {
                     tickFormatter={(v: number) => (v >= 1e6 ? `${(v / 1e6).toFixed(1)}M` : `${Math.round(v / 1000)}k`)}
                   />
                   <Tooltip
-                    contentStyle={{ background: 'var(--paper)', border: '1.5px solid var(--ink)', borderRadius: 3, color: 'var(--ink)' }}
+                    contentStyle={{ background: 'var(--card)', border: '1px solid var(--rule)', borderRadius: 8, color: 'var(--ink)' }}
                     labelFormatter={(d) => monthName(String(d))}
                     formatter={(value, name) => [usd(Number(value)), VARIANTS.find((v) => v.id === name)?.name ?? String(name)]}
                   />

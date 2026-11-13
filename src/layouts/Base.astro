@@ -1,9 +1,10 @@
 ---
-import '@fontsource-variable/big-shoulders-display/wght';
-import '@fontsource-variable/atkinson-hyperlegible-next/wght';
+import '@fontsource-variable/geist/wght';
+import { getCollection } from 'astro:content';
 import '../styles/global.css';
 import { CURRENCIES } from '../lib/format';
 import { nextStep } from '../lib/stages';
+import { searchIndex } from '../lib/search';
 
 interface Props {
   title: string;
@@ -14,6 +15,8 @@ const path = Astro.url.pathname;
 const next = nextStep(path);
 const fullTitle = title === 'Hobo Finance' ? title : `${title} | Hobo Finance`;
 const canonical = new URL(path, Astro.site);
+const posts = await getCollection('blog', (p) => !p.data.draft);
+const index = searchIndex(posts.map((p) => ({ href: `/blog/${p.id}/`, title: p.data.title, description: p.data.description })));
 ---
 
 <!doctype html>
@@ -29,7 +32,7 @@ const canonical = new URL(path, Astro.site);
     <meta property="og:type" content="website" />
     <meta property="og:url" content={canonical} />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <meta name="theme-color" content="#141b2d" />
+    <meta name="theme-color" content="#0f1b3d" />
     <script is:inline>
       (function () {
         var t = null;
@@ -44,15 +47,23 @@ const canonical = new URL(path, Astro.site);
   <body>
     <header class="site-head">
       <div class="wrap">
-        <a class="wordmark" href="/">Hobo Finance</a>
+        <a class="wordmark" href="/">
+          <svg viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="8" fill="#1d4ed8"></rect><path d="M10 8h3.6v6.4h4.8V8H22v16h-3.6v-6.4h-4.8V24H10z" fill="#fff"></path></svg>
+          Hobo Finance
+        </a>
         <nav aria-label="Main">
           <a href="/" aria-current={path === "/" ? "page" : undefined}>Start here</a>
           <a href="/tools/" aria-current={path.startsWith('/tools') ? 'page' : undefined}>Tools</a>
           <a href="/calculators/" aria-current={path.startsWith('/calculators') ? 'page' : undefined}>Basics</a>
           <a href="/blog/" aria-current={path.startsWith('/blog') ? 'page' : undefined}>Blog</a>
         </nav>
+        <div class="search">
+          <input id="site-search" type="search" placeholder="Search calculators and tools" autocomplete="off" role="combobox" aria-label="Search this site" aria-controls="search-results" aria-expanded="false" />
+          <ul class="search-results" id="search-results" role="listbox" hidden></ul>
+          <script type="application/json" id="search-index" set:html={JSON.stringify(index)} />
+        </div>
         <label class="currency">
-          Currency
+          <span>Currency</span>
           <select id="currency">
             {CURRENCIES.map((c) => <option value={c}>{c}</option>)}
           </select>
@@ -96,10 +107,72 @@ const canonical = new URL(path, Astro.site);
 
     <script>
       import { getCurrency, setCurrency } from '../lib/format';
+      import { search, type SearchItem } from '../lib/search';
       const select = document.querySelector<HTMLSelectElement>('#currency');
       if (select) {
         select.value = getCurrency();
         select.addEventListener('change', () => setCurrency(select.value));
+      }
+
+      // Site search: matches the typed words against a list of every page.
+      const box = document.querySelector<HTMLInputElement>('#site-search');
+      const list = document.querySelector<HTMLUListElement>('#search-results');
+      if (box && list) {
+        const items: SearchItem[] = JSON.parse(document.querySelector('#search-index')?.textContent ?? '[]');
+        let active = -1;
+        const close = () => {
+          list.hidden = true;
+          box.setAttribute('aria-expanded', 'false');
+          active = -1;
+        };
+        const mark = () => list.querySelectorAll('li[role="option"]').forEach((li, i) => li.setAttribute('aria-selected', String(i === active)));
+        const render = () => {
+          const q = box.value.trim();
+          if (!q) return close();
+          const hits = search(items, q);
+          list.replaceChildren();
+          if (hits.length === 0) {
+            const li = document.createElement('li');
+            li.className = 'empty';
+            li.textContent = 'No page matches. Try a shorter word, such as “loan” or “CPF”.';
+            list.append(li);
+          }
+          for (const h of hits) {
+            const li = document.createElement('li');
+            li.setAttribute('role', 'option');
+            const a = document.createElement('a');
+            a.href = h.href;
+            const t = document.createElement('strong');
+            t.textContent = h.title;
+            const d = document.createElement('span');
+            d.textContent = h.text;
+            a.append(t, d);
+            li.append(a);
+            list.append(li);
+          }
+          active = -1;
+          list.hidden = false;
+          box.setAttribute('aria-expanded', 'true');
+        };
+        box.addEventListener('input', render);
+        box.addEventListener('focus', render);
+        box.addEventListener('keydown', (e) => {
+          const links = list.querySelectorAll<HTMLAnchorElement>('li[role="option"] a');
+          if (e.key === 'Escape') {
+            close();
+          } else if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+            if (links.length === 0) return;
+            e.preventDefault();
+            active = (active + (e.key === 'ArrowDown' ? 1 : -1) + links.length) % links.length;
+            mark();
+          } else if (e.key === 'Enter' && links.length > 0) {
+            e.preventDefault();
+            location.href = links[Math.max(active, 0)].href;
+          }
+        });
+        document.addEventListener('click', (e) => {
+          if (!(e.target as Element).closest('.search')) close();
+        });
       }
 
       const toggle = document.querySelector<HTMLButtonElement>('#theme-toggle');

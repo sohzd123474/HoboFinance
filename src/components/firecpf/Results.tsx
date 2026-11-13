@@ -200,7 +200,7 @@ export default function Results({ plan, inputs, calc }: { plan: PlanState; input
                   <XAxis dataKey="age" minTickGap={28} stroke="var(--ink-soft)" tick={{ fill: 'var(--ink-soft)', fontSize: 12 }} />
                   <YAxis width={56} stroke="var(--ink-soft)" tick={{ fill: 'var(--ink-soft)', fontSize: 12 }} tickFormatter={axisMoney} />
                   <Tooltip
-                    contentStyle={{ background: 'var(--paper)', border: '1.5px solid var(--ink)', borderRadius: 3, color: 'var(--ink)' }}
+                    contentStyle={{ background: 'var(--card)', border: '1px solid var(--rule)', borderRadius: 8, color: 'var(--ink)' }}
                     labelFormatter={(age) => `Age ${age}`}
                     formatter={(value, name) => [sgd(Number(value)), name === 'liquid' ? 'Liquid portfolio' : 'CPF']}
                   />
